@@ -2,8 +2,8 @@ namespace Dns.Domain.Commands
 {
     public class CreateDomain
     {
-        public DomainName Name { get; }
+        public DomainName DomainName { get; }
 
-        public CreateDomain(DomainName name) => Name = name;
+        public CreateDomain(DomainName domainName) => DomainName = domainName;
     }
 }

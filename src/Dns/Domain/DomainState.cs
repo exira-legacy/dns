@@ -1,6 +1,6 @@
 namespace Dns.Domain
 {
-    using Dns.Domain.Events;
+    using Events;
 
     public partial class Domain
     {
@@ -13,7 +13,9 @@ namespace Dns.Domain
 
         private void When(DomainWasCreated @event)
         {
-            _name = new DomainName(@event.Name, @event.TopLevelDomain);
+            _name = new DomainName(
+                new SecondLevelDomain(@event.SecondLevelDomain),
+                TopLevelDomain.FromValue(@event.TopLevelDomain));
         }
     }
 }

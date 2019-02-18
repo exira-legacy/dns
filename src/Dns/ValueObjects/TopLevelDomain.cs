@@ -1,11 +1,16 @@
 namespace Dns
 {
-    // TODO: convert to enum class
-    public enum TopLevelDomain
+    using System.Diagnostics.CodeAnalysis;
+
+    public class TopLevelDomain : Enumeration<TopLevelDomain, string>
     {
-        be = 0,
-        eu = 1,
-        nl = 2,
-        com = 3
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
+        public static readonly TopLevelDomain
+            be = new TopLevelDomain("be", ".be"),
+            eu = new TopLevelDomain("eu", ".eu"),
+            nl = new TopLevelDomain("nl", ".nl"),
+            com = new TopLevelDomain("com", ".com");
+
+        private TopLevelDomain(string extension, string displayName) : base(extension, displayName) { }
     }
 }

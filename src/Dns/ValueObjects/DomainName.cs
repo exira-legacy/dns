@@ -1,31 +1,32 @@
 namespace Dns
 {
+    using System;
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
 
     public class DomainName : ValueObject<DomainName>
     {
-        public string Name { get; }
+        public SecondLevelDomain SecondLevelDomain { get; }
 
         public TopLevelDomain TopLevelDomain { get; }
 
-        public DomainName(string name, TopLevelDomain topLevelDomain)
+        public DomainName(
+            SecondLevelDomain secondLevelDomain,
+            TopLevelDomain topLevelDomain)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new NoNameException("Name of a domain cannot be empty.");
+            SecondLevelDomain = secondLevelDomain
+                                ?? throw new ArgumentNullException(nameof(secondLevelDomain), "Second level domain of domain name is missing.");
 
-            // TODO: Add validation rules for a domainname + unit tests
-
-            Name = name;
-            TopLevelDomain = topLevelDomain;
+            TopLevelDomain = topLevelDomain
+                             ?? throw new ArgumentNullException(nameof(topLevelDomain), "Top level domain of domain name is missing.");
         }
 
         protected override IEnumerable<object> Reflect()
         {
-            yield return Name;
+            yield return SecondLevelDomain;
             yield return TopLevelDomain;
         }
 
-        public override string ToString() => $"{Name}.{TopLevelDomain}";
+        public override string ToString() => $"{SecondLevelDomain}{TopLevelDomain}";
     }
 }

@@ -15,7 +15,7 @@ namespace Dns.Domain
                 {
                     var domains = getDomains();
 
-                    var domainName = message.Command.Name;
+                    var domainName = message.Command.DomainName;
                     var domain = Domain.Register(domainName);
 
                     domains.Add(domainName, domain);

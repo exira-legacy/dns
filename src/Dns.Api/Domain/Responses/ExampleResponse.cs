@@ -1,4 +1,4 @@
-namespace Dns.Api.Example.Responses
+namespace Dns.Api.Domain.Responses
 {
     using System;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;

@@ -1,4 +1,4 @@
-namespace Dns.Api.Example
+namespace Dns.Api.Domain
 {
     using System;
     using System.Threading;
@@ -24,7 +24,7 @@ namespace Dns.Api.Example
         /// </summary>
         /// <param name="bus"></param>
         /// <param name="commandId">Optionele unieke id voor het verzoek.</param>
-        /// <param name="command"></param>
+        /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <response code="202">Als het verzoek aanvaard is.</response>
         /// <response code="400">Als het verzoek ongeldige data bevat.</response>
@@ -34,23 +34,26 @@ namespace Dns.Api.Example
         [ProducesResponseType(typeof(void), StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
-        [SwaggerRequestExample(typeof(DomainRequest), typeof(DomainRequestExample))]
+        [SwaggerRequestExample(typeof(CreateDomainRequest), typeof(CreateDomainRequestExample))]
         [SwaggerResponseExample(StatusCodes.Status202Accepted, typeof(CommandResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         public async Task<IActionResult> Post(
             [FromServices] ICommandHandlerResolver bus,
             [FromCommandId] Guid commandId,
-            [FromBody] DomainRequest command,
+            [FromBody] CreateDomainRequest request,
             CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState); // TODO: Check what this returns in the response
+                return BadRequest(ModelState);
+
+            var command = CreateDomainRequestMapping.Map(request);
 
             return Accepted(
+                $"/v1/domains/{command.DomainName}",
                 await bus.Dispatch(
                     commandId,
-                    DomainRequestMapping.Map(command),
+                    command,
                     GetMetadata(),
                     cancellationToken));
         }

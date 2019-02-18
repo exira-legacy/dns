@@ -7,21 +7,23 @@ namespace Dns.Domain.Events
     [EventDescription("The domain was created.")]
     public class DomainWasCreated
     {
-        public string Name { get; }
-        public TopLevelDomain TopLevelDomain { get; }
+        public string SecondLevelDomain { get; }
+        public string TopLevelDomain { get; }
 
         public DomainWasCreated(
-            DomainName name)
+            DomainName domainName)
         {
-            Name = name.Name;
-            TopLevelDomain = name.TopLevelDomain;
+            SecondLevelDomain = domainName.SecondLevelDomain;
+            TopLevelDomain = domainName.TopLevelDomain.Value;
         }
 
         [JsonConstructor]
         private DomainWasCreated(
-            string name,
-            TopLevelDomain topLevelDomain)
+            string secondLevelDomain,
+            string topLevelDomain)
             : this(
-                new DomainName(name, topLevelDomain)) {}
+                new DomainName(
+                    new SecondLevelDomain(secondLevelDomain),
+                    Dns.TopLevelDomain.FromValue(topLevelDomain))) {}
     }
 }
