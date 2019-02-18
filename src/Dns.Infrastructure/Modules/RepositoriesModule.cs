@@ -1,7 +1,7 @@
 namespace Dns.Infrastructure.Modules
 {
     using Autofac;
-    using Example;
+    using Domain;
     using Repositories;
 
     public class RepositoriesModule : Module
@@ -10,8 +10,8 @@ namespace Dns.Infrastructure.Modules
         {
             // We could just scan the assembly for classes using Repository<> and registering them against the only interface they implement
             containerBuilder
-                .RegisterType<Examples>()
-                .As<IExamples>();
+                .RegisterType<Domains>()
+                .As<IDomains>();
         }
     }
 }
