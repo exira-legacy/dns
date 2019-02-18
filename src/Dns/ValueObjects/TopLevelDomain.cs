@@ -4,13 +4,19 @@ namespace Dns
 
     public class TopLevelDomain : Enumeration<TopLevelDomain, string>
     {
+        public string FullName { get; }
+
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         public static readonly TopLevelDomain
-            be = new TopLevelDomain("be", ".be"),
-            eu = new TopLevelDomain("eu", ".eu"),
-            nl = new TopLevelDomain("nl", ".nl"),
-            com = new TopLevelDomain("com", ".com");
+            be = new TopLevelDomain("be", ".be", "Belgium"),
+            eu = new TopLevelDomain("eu", ".eu", "Europe"),
+            nl = new TopLevelDomain("nl", ".nl", "The Netherlands"),
+            com = new TopLevelDomain("com", ".com", "Commercial");
 
-        private TopLevelDomain(string extension, string displayName) : base(extension, displayName) { }
+        private TopLevelDomain(
+            string extension,
+            string displayName,
+            string fullName) : base(extension, displayName)
+            => FullName = fullName;
     }
 }
