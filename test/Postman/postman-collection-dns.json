@@ -1,0 +1,40 @@
+{
+	"info": {
+		"_postman_id": "3decae0e-975b-4177-b9ba-1ce46134e99b",
+		"name": "exira.com Dns API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Domain",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\tsecondLevelDomain: \"exira\",\n\ttopLevelDomain: \"com\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:1090/v1/domains",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "1090",
+					"path": [
+						"v1",
+						"domains"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

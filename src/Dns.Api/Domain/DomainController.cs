@@ -23,12 +23,12 @@ namespace Dns.Api.Domain
         /// Register a domain.
         /// </summary>
         /// <param name="bus"></param>
-        /// <param name="commandId">Optionele unieke id voor het verzoek.</param>
+        /// <param name="commandId">Optional unique identifier for the request.</param>
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
-        /// <response code="202">Als het verzoek aanvaard is.</response>
-        /// <response code="400">Als het verzoek ongeldige data bevat.</response>
-        /// <response code="500">Als er een interne fout is opgetreden.</response>
+        /// <response code="202">If the request has been accepted.</response>
+        /// <response code="400">If the request contains invalid data.</response>
+        /// <response code="500">If an internal error has occurred.</response>
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(typeof(void), StatusCodes.Status202Accepted)]
@@ -48,6 +48,10 @@ namespace Dns.Api.Domain
                 return BadRequest(ModelState);
 
             var command = CreateDomainRequestMapping.Map(request);
+
+            // TODO: Sending an empty body should give a proper bad request
+            // TODO: Sending null for top level domain should give a decent error, not 500
+            // TODO: Registering an existing domain should give a decent error, not 500
 
             return Accepted(
                 $"/v1/domains/{command.DomainName}",

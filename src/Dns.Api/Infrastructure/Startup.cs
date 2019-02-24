@@ -66,7 +66,7 @@ namespace Dns.Api.Infrastructure
             IApiVersionDescriptionProvider apiVersionProvider,
             MsSqlStreamStore streamStore)
         {
-            // StartupHelpers.EnsureSqlStreamStoreSchema<Startup>(streamStore, loggerFactory);
+            StartupHelpers.EnsureSqlStreamStoreSchema<Startup>(streamStore, loggerFactory);
 
             app.UseDefaultForApi(new StartupOptions
             {
@@ -93,6 +93,6 @@ namespace Dns.Api.Infrastructure
         }
 
         private static string GetApiLeadingText(ApiVersionDescription description)
-            => $"Momenteel leest u de documentatie voor versie {description.ApiVersion} van de exira.com Dns API{string.Format(description.IsDeprecated ? ", **deze API versie is niet meer ondersteund * *." : ".")}";
+            => $"Right now you are reading the documentation for version {description.ApiVersion} of the exira.com Dns API{string.Format(description.IsDeprecated ? ", **this API version is not supported any more**." : ".")}";
     }
 }

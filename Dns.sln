@@ -37,6 +37,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dns.Infrastructure", "src\D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dns.Api", "src\Dns.Api\Dns.Api.csproj", "{B569C6D4-5A45-44B1-8362-C0500FB7F818}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Postman", "Postman", "{5D2F894C-C811-41C5-8D60-BDD779422AE9}"
+	ProjectSection(SolutionItems) = preProject
+		test\Postman\postman-collection-dns.json = test\Postman\postman-collection-dns.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +78,7 @@ Global
 		{F2D21D44-C462-4332-B93B-89CE8540334A} = {9B81B90F-47EA-43A5-8927-C0EAB2273BB6}
 		{7CF9BA80-BCE5-45D7-B176-87CC033CD7CA} = {40C96AFD-C191-4A56-B7D0-540C1EB501BC}
 		{B569C6D4-5A45-44B1-8362-C0500FB7F818} = {40C96AFD-C191-4A56-B7D0-540C1EB501BC}
+		{5D2F894C-C811-41C5-8D60-BDD779422AE9} = {9B81B90F-47EA-43A5-8927-C0EAB2273BB6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2EB87445-E263-4E1E-89CC-3839170028E5}

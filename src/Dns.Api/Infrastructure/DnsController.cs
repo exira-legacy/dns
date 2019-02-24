@@ -1,7 +1,6 @@
 namespace Dns.Api.Infrastructure
 {
     using System.Collections.Generic;
-    using System.Security.Claims;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.AspNetCore.Mvc.Middleware;
 
