@@ -8,7 +8,7 @@ namespace Dns
 
     [Serializable]
     [DebuggerDisplay("{DisplayName} - {Value}")]
-    public abstract class Enumeration<TEnumeration> : Enumeration<TEnumeration, int>
+    public abstract class Enumeration<TEnumeration> : Enumeration<TEnumeration, int, EnumerationException>
         where TEnumeration : Enumeration<TEnumeration>
     {
         protected Enumeration(int value, string displayName)
@@ -24,9 +24,10 @@ namespace Dns
     [Serializable]
     [DebuggerDisplay("{DisplayName} - {Value}")]
     [DataContract(Namespace = "http://github.com/HeadspringLabs/Enumeration/5/13")]
-    public abstract class Enumeration<TEnumeration, TValue> : IComparable<TEnumeration>, IEquatable<TEnumeration>
-        where TEnumeration : Enumeration<TEnumeration, TValue>
+    public abstract class Enumeration<TEnumeration, TValue, TException> : IComparable<TEnumeration>, IEquatable<TEnumeration>
+        where TEnumeration : Enumeration<TEnumeration, TValue, TException>
         where TValue : IComparable
+        where TException : EnumerationException
     {
         private static readonly Lazy<TEnumeration[]> Enumerations = new Lazy<TEnumeration[]>(GetEnumerations);
 
@@ -74,10 +75,10 @@ namespace Dns
         public override int GetHashCode()
             => Value.GetHashCode();
 
-        public static bool operator ==(Enumeration<TEnumeration, TValue> left, Enumeration<TEnumeration, TValue> right)
+        public static bool operator ==(Enumeration<TEnumeration, TValue, TException> left, Enumeration<TEnumeration, TValue, TException> right)
             => Equals(left, right);
 
-        public static bool operator !=(Enumeration<TEnumeration, TValue> left, Enumeration<TEnumeration, TValue> right)
+        public static bool operator !=(Enumeration<TEnumeration, TValue, TException> left, Enumeration<TEnumeration, TValue, TException> right)
             => !Equals(left, right);
 
         public static TEnumeration FromValue(TValue value)
@@ -98,7 +99,24 @@ namespace Dns
                 return result;
 
             var message = $"'{value}' is not a valid {description} in {typeof(TEnumeration)}";
-            throw new ArgumentException(message, nameof(value));
+            throw CreateException(message, value, typeof(TEnumeration).Name, nameof(value));
+        }
+
+        private static EnumerationException CreateException(string message, object value, string type, string paramName)
+        {
+            try
+            {
+                return Activator.CreateInstance(
+                    typeof(TException),
+                    message,
+                    paramName,
+                    value,
+                    type) as TException;
+            }
+            catch
+            {
+                return new EnumerationException(message, paramName, value, type);
+            }
         }
 
         public static bool TryParse(TValue value, out TEnumeration result)
@@ -109,5 +127,17 @@ namespace Dns
 
         protected virtual bool ValueEquals(TValue value)
             => Value.Equals(value);
+    }
+
+    public class EnumerationException : ArgumentException
+    {
+        public object Value { get; }
+        public string Type { get; }
+
+        public EnumerationException(string message, string paramName, object value, string type) : base(message, paramName)
+        {
+            Value = value;
+            Type = type;
+        }
     }
 }

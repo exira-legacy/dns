@@ -6,7 +6,9 @@ namespace Dns.Api.Infrastructure
     using Be.Vlaanderen.Basisregisters.Api;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
+    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Configuration;
+    using Exceptions;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -78,7 +80,15 @@ namespace Dns.Api.Infrastructure
                 Api =
                 {
                     VersionProvider = apiVersionProvider,
-                    Info = groupName => $"exira.com - Dns API {groupName}"
+                    Info = groupName => $"exira.com - Dns API {groupName}",
+                    CustomExceptionHandlers = new IExceptionHandler[]
+                    {
+                        new DomainExceptionHandler(),
+                        new Exceptions.ApiExceptionHandler(),
+                        new AggregateNotFoundExceptionHandling(),
+                        new WrongExpectedVersionExceptionHandling(),
+                        new InvalidTopLevelDomainExceptionHandling(), 
+                    }
                 },
                 Server =
                 {
@@ -88,7 +98,7 @@ namespace Dns.Api.Infrastructure
                 MiddlewareHooks =
                 {
                     AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>(),
-                }
+                },
             });
         }
 

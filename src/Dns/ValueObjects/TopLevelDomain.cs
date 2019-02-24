@@ -2,7 +2,13 @@ namespace Dns
 {
     using System.Diagnostics.CodeAnalysis;
 
-    public class TopLevelDomain : Enumeration<TopLevelDomain, string>
+    public class InvalidTopLevelDomainException : EnumerationException
+    {
+        public InvalidTopLevelDomainException(string message, string paramName, object value, string type) :
+            base(message, paramName, value, type) { }
+    }
+
+    public class TopLevelDomain : Enumeration<TopLevelDomain, string, InvalidTopLevelDomainException>
     {
         public string FullName { get; }
 

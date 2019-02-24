@@ -51,7 +51,10 @@ namespace Dns.Api.Domain
 
             // TODO: Sending an empty body should give a proper bad request
             // TODO: Sending null for top level domain should give a decent error, not 500
-            // TODO: Registering an existing domain should give a decent error, not 500
+            // TODO: Apikey description in documentation should be translatable
+            // TODO: Add bad format response code if it is not json
+            // TODO: Add endpoint to POST services to (like google apps, etc)
+            // TODO: Add endpoint to list services
 
             return Accepted(
                 $"/v1/domains/{command.DomainName}",
