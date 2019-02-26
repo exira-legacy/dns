@@ -1,8 +1,7 @@
 namespace Dns
 {
-    using System;
-    using Be.Vlaanderen.Basisregisters.CommandHandling.SqlStreamStore.Autofac;
     using Autofac;
+    using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Domain;
 
     public static class CommandHandlerModules
@@ -10,11 +9,9 @@ namespace Dns
         public static void Register(ContainerBuilder containerBuilder)
         {
             containerBuilder
-                .RegisterSqlStreamStoreCommandHandler<DomainCommandHandlerModule>(
-                    c => handler =>
-                        new DomainCommandHandlerModule(
-                            c.Resolve<Func<IDomains>>(),
-                            handler));
+                .RegisterType<DomainCommandHandlerModule>()
+                .Named<CommandHandlerModule>(typeof(DomainCommandHandlerModule).FullName)
+                .As<CommandHandlerModule>();
         }
     }
 }

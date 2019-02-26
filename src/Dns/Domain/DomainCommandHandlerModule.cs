@@ -1,16 +1,24 @@
 namespace Dns.Domain
 {
     using System;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
+    using Be.Vlaanderen.Basisregisters.CommandHandling.SqlStreamStore;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
     using Commands;
+    using SqlStreamStore;
 
     public sealed class DomainCommandHandlerModule : CommandHandlerModule
     {
         public DomainCommandHandlerModule(
             Func<IDomains> getDomains,
-            ReturnHandler<CommandMessage> finalHandler = null) : base(finalHandler)
+            Func<ConcurrentUnitOfWork> getUnitOfWork,
+            Func<IStreamStore> getStreamStore,
+            EventMapping eventMapping,
+            EventSerializer eventSerializer)
         {
             For<CreateDomain>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)
                 .Handle(async (message, ct) =>
                 {
                     var domains = getDomains();
