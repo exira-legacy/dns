@@ -18,6 +18,14 @@ namespace Dns.Domain
         public void AddGoogleSuite()
         {
             ApplyChange(new GoogleSuiteWasAdded());
+
+            CalculateRecordSet();
+        }
+
+        private void CalculateRecordSet()
+        {
+            // TODO: Build RecordSet from services and update if changed
+            ApplyChange(new RecordSetUpdated());
         }
     }
 }

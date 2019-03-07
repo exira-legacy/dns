@@ -28,7 +28,9 @@ namespace Dns.Tests.AddGoogleSuite
             Assert(new Scenario()
                 .Given(domainName, new DomainWasCreated(domainName))
                 .When(new AddGoogleSuite(domainName))
-                .Then(domainName, new GoogleSuiteWasAdded()));
+                .Then(domainName,
+                    new GoogleSuiteWasAdded(),
+                    new RecordSetUpdated()));
         }
     }
 }
