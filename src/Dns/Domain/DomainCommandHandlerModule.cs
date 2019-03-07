@@ -28,6 +28,18 @@ namespace Dns.Domain
 
                     domains.Add(domainName, domain);
                 });
+
+            For<AddGoogleSuite>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)
+                .Handle(async (message, ct) =>
+                {
+                    var domains = getDomains();
+
+                    var domainName = message.Command.DomainName;
+                    var domain = await domains.GetAsync(domainName, ct);
+
+                    domain.AddGoogleSuite();
+                });
         }
     }
 }

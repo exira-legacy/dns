@@ -14,5 +14,10 @@ namespace Dns.Domain
             domain.ApplyChange(new DomainWasCreated(domainName));
             return domain;
         }
+
+        public void AddGoogleSuite()
+        {
+            ApplyChange(new GoogleSuiteWasAdded());
+        }
     }
 }
