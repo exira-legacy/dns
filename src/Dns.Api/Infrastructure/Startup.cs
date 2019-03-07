@@ -87,7 +87,7 @@ namespace Dns.Api.Infrastructure
                         new Exceptions.ApiExceptionHandler(),
                         new AggregateNotFoundExceptionHandling(),
                         new WrongExpectedVersionExceptionHandling(),
-                        new InvalidTopLevelDomainExceptionHandling(), 
+                        new InvalidTopLevelDomainExceptionHandling(),
                     }
                 },
                 Server =

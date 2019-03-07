@@ -17,6 +17,8 @@ namespace Dns.Domain.Events
             Records = recordSet
                 .Select(r => new RecordData
                 {
+                    Type = r.Type,
+                    TimeToLive = r.TimeToLive,
                     Label = r.Label,
                     Value = r.Value
                 })
@@ -26,12 +28,19 @@ namespace Dns.Domain.Events
         [JsonConstructor]
         private RecordSetUpdated(
             IReadOnlyCollection<RecordData> records)
-            : this(new RecordSet(records.Select(r => new Record(r.Label, r.Value)).ToList())) { }
+            : this(
+                new RecordSet(
+                    records.Select(r => new Record(
+                        r.Type,
+                        r.TimeToLive,
+                        r.Label,
+                        r.Value)).ToList())) { }
     }
 
-    // TODO: Refactor this
     public class RecordData
     {
+        public RecordType Type { get; set; }
+        public int TimeToLive { get; set; }
         public string Label { get; set; }
         public string Value { get; set; }
     }
