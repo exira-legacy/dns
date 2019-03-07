@@ -2,7 +2,10 @@ namespace Dns.Domain
 {
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using System;
+    using System.Linq;
     using Events;
+    using Services.GoogleSuite;
+    using Services.GoogleSuite.Events;
 
     public partial class Domain : AggregateRootEntity
     {
@@ -15,17 +18,21 @@ namespace Dns.Domain
             return domain;
         }
 
-        public void AddGoogleSuite()
+        public void AddGoogleSuite(GoogleVerificationToken verificationToken)
         {
-            ApplyChange(new GoogleSuiteWasAdded());
+            ApplyChange(new GoogleSuiteWasAdded(verificationToken));
 
-            CalculateRecordSet();
+            UpdateRecordSet();
         }
 
-        private void CalculateRecordSet()
+        private void UpdateRecordSet()
         {
-            // TODO: Build RecordSet from services and update if changed
-            ApplyChange(new RecordSetUpdated());
+            ApplyChange(
+                new RecordSetUpdated(
+                    _services.Aggregate(
+                        new RecordSet(),
+                        (r, service) => r.AddRecords(service.GetRecords()),
+                        r => r)));
         }
     }
 }

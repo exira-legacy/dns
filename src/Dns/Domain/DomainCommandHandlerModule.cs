@@ -6,6 +6,7 @@ namespace Dns.Domain
     using Be.Vlaanderen.Basisregisters.CommandHandling.SqlStreamStore;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Commands;
+    using Services.GoogleSuite.Commands;
     using SqlStreamStore;
 
     public sealed class DomainCommandHandlerModule : CommandHandlerModule
@@ -38,7 +39,7 @@ namespace Dns.Domain
                     var domainName = message.Command.DomainName;
                     var domain = await domains.GetAsync(domainName, ct);
 
-                    domain.AddGoogleSuite();
+                    domain.AddGoogleSuite(message.Command.VerificationToken);
                 });
         }
     }

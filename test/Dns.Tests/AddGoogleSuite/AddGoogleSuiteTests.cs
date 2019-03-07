@@ -2,8 +2,10 @@ namespace Dns.Tests.AddGoogleSuite
 {
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
-    using Domain.Commands;
     using Domain.Events;
+    using Domain.Services.GoogleSuite;
+    using Domain.Services.GoogleSuite.Commands;
+    using Domain.Services.GoogleSuite.Events;
     using Xunit;
     using Xunit.Abstractions;
     using DomainName = DomainName;
@@ -18,19 +20,21 @@ namespace Dns.Tests.AddGoogleSuite
             Fixture.CustomizeSecondLevelDomain();
             Fixture.CustomizeTopLevelDomain();
             Fixture.CustomizeDomainName();
+            Fixture.CustomizeGoogleVerificationToken();
         }
 
         [Fact]
         public void google_suite_should_be_added()
         {
             var domainName = Fixture.Create<DomainName>();
+            var verificationToken = Fixture.Create<GoogleVerificationToken>();
 
             Assert(new Scenario()
                 .Given(domainName, new DomainWasCreated(domainName))
-                .When(new AddGoogleSuite(domainName))
+                .When(new AddGoogleSuite(domainName, verificationToken))
                 .Then(domainName,
-                    new GoogleSuiteWasAdded(),
-                    new RecordSetUpdated()));
+                    new GoogleSuiteWasAdded(verificationToken),
+                    new RecordSetUpdated(new GoogleSuiteService(verificationToken).GetRecords())));
         }
     }
 }

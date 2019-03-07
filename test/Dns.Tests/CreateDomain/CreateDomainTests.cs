@@ -7,11 +7,11 @@ namespace Dns.Tests.CreateDomain
     using Xunit;
     using Xunit.Abstractions;
 
-    public class given_valid_domainname : DnsTest
+    public class CreateDomainTests : DnsTest
     {
         public Fixture Fixture { get; }
 
-        public given_valid_domainname(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public CreateDomainTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
             Fixture = new Fixture();
             Fixture.CustomizeSecondLevelDomain();
@@ -19,7 +19,7 @@ namespace Dns.Tests.CreateDomain
         }
 
         [Fact]
-        public void then_domain_should_have_been_created()
+        public void domain_should_have_been_created()
         {
             var createDomainCommand = Fixture.Create<CreateDomain>();
 
