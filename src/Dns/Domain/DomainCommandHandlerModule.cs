@@ -40,7 +40,10 @@ namespace Dns.Domain
                     var domainName = message.Command.DomainName;
                     var domain = await domains.GetAsync(domainName, ct);
 
-                    domain.AddManual(message.Command.Label, message.Command.Records);
+                    domain.AddManual(
+                        message.Command.ServiceId,
+                        message.Command.Label,
+                        message.Command.Records);
                 });
 
             For<AddGoogleSuite>()
@@ -52,7 +55,9 @@ namespace Dns.Domain
                     var domainName = message.Command.DomainName;
                     var domain = await domains.GetAsync(domainName, ct);
 
-                    domain.AddGoogleSuite(message.Command.VerificationToken);
+                    domain.AddGoogleSuite(
+                        message.Command.ServiceId,
+                        message.Command.VerificationToken);
                 });
         }
     }

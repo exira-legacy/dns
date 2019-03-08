@@ -34,16 +34,17 @@ namespace Dns.Tests
         public void manual_should_be_added()
         {
             var domainName = Fixture.Create<DomainName>();
+            var serviceId = Fixture.Create<ServiceId>();
             var label = Fixture.Create<ManualLabel>();
             var recordset = new RecordSet(Fixture.CreateMany<Record>(10));
 
-            var manualService = new ManualService(label, recordset);
+            var manualService = new ManualService(serviceId, label, recordset);
 
             Assert(new Scenario()
                 .Given(domainName, new DomainWasCreated(domainName))
-                .When(new AddManual(domainName, label, recordset))
+                .When(new AddManual(domainName, serviceId, label, recordset))
                 .Then(domainName,
-                    new ManualWasAdded(label, recordset),
+                    new ManualWasAdded(serviceId, label, recordset),
                     new RecordSetUpdated(manualService.GetRecords())));
         }
     }

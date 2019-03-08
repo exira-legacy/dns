@@ -28,14 +28,17 @@ namespace Dns.Tests
         public void google_suite_should_be_added()
         {
             var domainName = Fixture.Create<DomainName>();
+            var serviceId = Fixture.Create<ServiceId>();
             var verificationToken = Fixture.Create<GoogleVerificationToken>();
+
+            var googleService = new GoogleSuiteService(serviceId, verificationToken);
 
             Assert(new Scenario()
                 .Given(domainName, new DomainWasCreated(domainName))
-                .When(new AddGoogleSuite(domainName, verificationToken))
+                .When(new AddGoogleSuite(domainName, serviceId, verificationToken))
                 .Then(domainName,
-                    new GoogleSuiteWasAdded(verificationToken),
-                    new RecordSetUpdated(new GoogleSuiteService(verificationToken).GetRecords())));
+                    new GoogleSuiteWasAdded(serviceId, verificationToken),
+                    new RecordSetUpdated(googleService.GetRecords())));
         }
     }
 }

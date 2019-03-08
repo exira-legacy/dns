@@ -31,6 +31,7 @@ namespace Dns.Domain
         {
             _services.Add(
                 new ManualService(
+                    new ServiceId(@event.ServiceId),
                     new ManualLabel(@event.Label),
                     new RecordSet(
                         @event.Records.Select(r => new Record(
@@ -44,6 +45,7 @@ namespace Dns.Domain
         {
             _services.Add(
                 new GoogleSuiteService(
+                    new ServiceId(@event.ServiceId),
                     new GoogleVerificationToken(@event.VerificationToken)));
         }
     }

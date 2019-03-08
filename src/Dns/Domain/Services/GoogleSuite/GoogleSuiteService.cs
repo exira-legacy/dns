@@ -4,7 +4,16 @@ namespace Dns.Domain.Services.GoogleSuite
     {
         private readonly GoogleVerificationToken _verificationToken;
 
-        public GoogleSuiteService(GoogleVerificationToken verificationToken) => _verificationToken = verificationToken;
+        public ServiceId ServiceId { get; }
+
+        public GoogleSuiteService(
+            ServiceId serviceId,
+            GoogleVerificationToken verificationToken)
+        {
+            ServiceId = serviceId;
+
+            _verificationToken = verificationToken;
+        }
 
         public RecordSet GetRecords()
         {

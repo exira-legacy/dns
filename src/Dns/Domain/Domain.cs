@@ -20,15 +20,15 @@ namespace Dns.Domain
             return domain;
         }
 
-        public void AddManual(ManualLabel label, RecordSet records)
+        public void AddManual(ServiceId serviceId, ManualLabel label, RecordSet records)
         {
-            ApplyChange(new ManualWasAdded(label, records));
+            ApplyChange(new ManualWasAdded(serviceId, label, records));
             UpdateRecordSet();
         }
 
-        public void AddGoogleSuite(GoogleVerificationToken verificationToken)
+        public void AddGoogleSuite(ServiceId serviceId, GoogleVerificationToken verificationToken)
         {
-            ApplyChange(new GoogleSuiteWasAdded(verificationToken));
+            ApplyChange(new GoogleSuiteWasAdded(serviceId, verificationToken));
             UpdateRecordSet();
         }
 

@@ -15,13 +15,7 @@ namespace Dns.Domain.Events
             RecordSet recordSet)
         {
             Records = recordSet
-                .Select(r => new RecordData
-                {
-                    Type = r.Type.Value,
-                    TimeToLive = r.TimeToLive,
-                    Label = r.Label,
-                    Value = r.Value
-                })
+                .Select(r => new RecordData(r))
                 .ToArray();
         }
 
@@ -29,19 +23,6 @@ namespace Dns.Domain.Events
         private RecordSetUpdated(
             IReadOnlyCollection<RecordData> records)
             : this(
-                new RecordSet(
-                    records.Select(r => new Record(
-                        RecordType.FromValue(r.Type),
-                        new TimeToLive(r.TimeToLive),
-                        new RecordLabel(r.Label),
-                        new RecordValue(r.Value))).ToList())) { }
-
-        public class RecordData
-        {
-            public string Type { get; set; }
-            public int TimeToLive { get; set; }
-            public string Label { get; set; }
-            public string Value { get; set; }
-        }
+                new RecordSet(records.Select(r => r.ToRecord()).ToList())) { }
     }
 }
