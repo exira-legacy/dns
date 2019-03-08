@@ -1,6 +1,7 @@
 namespace Dns
 {
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Exceptions;
     using Newtonsoft.Json;
 
     public class RecordValue : StringValueObject<RecordValue>
@@ -9,9 +10,8 @@ namespace Dns
 
         public RecordValue([JsonProperty("value")] string value) : base(value)
         {
-            // TODO: Throw different exception
             if (string.IsNullOrWhiteSpace(value))
-                throw new NoNameException("Value of a record cannot be empty.");
+                throw new EmptyRecordValueException();
         }
     }
 }

@@ -1,5 +1,6 @@
 namespace Dns.Tests
 {
+    using Exceptions;
     using Xunit;
 
     public class SecondLevelDomainTests
@@ -12,7 +13,7 @@ namespace Dns.Tests
             var ex = Record.Exception(NullDomain);
 
             Assert.NotNull(ex);
-            Assert.IsType<NoNameException>(ex);
+            Assert.IsType<EmptySecondLevelDomainException>(ex);
         }
 
         [Fact]

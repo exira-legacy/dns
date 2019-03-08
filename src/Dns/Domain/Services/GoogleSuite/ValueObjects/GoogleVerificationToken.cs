@@ -1,6 +1,7 @@
 namespace Dns.Domain.Services.GoogleSuite
 {
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Exceptions;
     using Newtonsoft.Json;
 
     public class GoogleVerificationToken : StringValueObject<GoogleVerificationToken>
@@ -12,7 +13,7 @@ namespace Dns.Domain.Services.GoogleSuite
         public GoogleVerificationToken([JsonProperty("value")] string token) : base(token)
         {
             if (string.IsNullOrWhiteSpace(token))
-                throw new NoNameException("Token of a Google domain verification token cannot be empty.");
+                throw new EmptyGoogleVerificationTokenException();
         }
     }
 }

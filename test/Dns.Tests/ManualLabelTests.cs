@@ -1,6 +1,7 @@
 namespace Dns.Tests
 {
     using Domain.Services.Manual;
+    using Domain.Services.Manual.Exceptions;
     using Xunit;
 
     public class ManualLabelTests
@@ -13,7 +14,7 @@ namespace Dns.Tests
             var ex = Record.Exception(NullLabel);
 
             Assert.NotNull(ex);
-            Assert.IsType<NoNameException>(ex);
+            Assert.IsType<EmptyManualLabelException>(ex);
         }
 
         [Theory]

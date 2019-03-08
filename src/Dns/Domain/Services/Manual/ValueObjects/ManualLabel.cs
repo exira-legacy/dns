@@ -1,6 +1,7 @@
 namespace Dns.Domain.Services.Manual
 {
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Exceptions;
     using Newtonsoft.Json;
 
     public class ManualLabel : StringValueObject<ManualLabel>
@@ -10,7 +11,7 @@ namespace Dns.Domain.Services.Manual
         public ManualLabel([JsonProperty("value")] string label) : base(label)
         {
             if (string.IsNullOrWhiteSpace(label))
-                throw new NoNameException("Label of a manual service cannot be empty.");
+                throw new EmptyManualLabelException();
         }
     }
 }

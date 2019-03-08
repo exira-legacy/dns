@@ -1,6 +1,7 @@
 namespace Dns.Tests
 {
     using Domain.Services.GoogleSuite;
+    using Domain.Services.GoogleSuite.Exceptions;
     using Xunit;
 
     public class GoogleVerificationTokenTests
@@ -13,7 +14,7 @@ namespace Dns.Tests
             var ex = Record.Exception(NullToken);
 
             Assert.NotNull(ex);
-            Assert.IsType<NoNameException>(ex);
+            Assert.IsType<EmptyGoogleVerificationTokenException>(ex);
         }
 
         [Theory]

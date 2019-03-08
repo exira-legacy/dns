@@ -1,6 +1,7 @@
 namespace Dns
 {
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Exceptions;
     using Newtonsoft.Json;
 
     public class TimeToLive : IntegerValueObject<TimeToLive>
@@ -9,9 +10,8 @@ namespace Dns
 
         public TimeToLive([JsonProperty("value")] int timeToLive) : base(timeToLive)
         {
-            // TODO: Throw different exception
             if (timeToLive <= 0)
-                throw new NoNameException("Time to live cannot be negative.");
+                throw new NegativeTimeToLiveException();
         }
     }
 }
