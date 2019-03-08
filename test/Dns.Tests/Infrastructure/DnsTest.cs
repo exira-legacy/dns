@@ -1,13 +1,13 @@
-namespace Dns.Tests
+namespace Dns.Tests.Infrastructure
 {
     using System.Collections.Generic;
-    using Be.Vlaanderen.Basisregisters.EventHandling;
-    using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
     using Autofac;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing.Comparers;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing.SqlStreamStore.Autofac;
-    using Infrastructure.Modules;
+    using Be.Vlaanderen.Basisregisters.EventHandling;
+    using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
+    using Dns.Infrastructure.Modules;
     using KellermanSoftware.CompareNetObjects;
     using Microsoft.Extensions.Configuration;
     using Newtonsoft.Json;

@@ -1,19 +1,25 @@
-namespace Dns.Domain.Events
+namespace Dns.Domain.Services.Manual.Events
 {
     using System.Collections.Generic;
     using System.Linq;
     using Be.Vlaanderen.Basisregisters.EventHandling;
+    using Manual;
     using Newtonsoft.Json;
 
-    [EventName("RecordSetUpdated")]
-    [EventDescription("The complete record set was updated.")]
-    public class RecordSetUpdated
+    [EventName("ManualWasAdded")]
+    [EventDescription("The manual service was added.")]
+    public class ManualWasAdded
     {
+        public string Label { get; }
+
         public RecordData[] Records { get; }
 
-        public RecordSetUpdated(
+        public ManualWasAdded(
+            ManualLabel label,
             RecordSet recordSet)
         {
+            Label = label;
+
             Records = recordSet
                 .Select(r => new RecordData
                 {
@@ -26,15 +32,18 @@ namespace Dns.Domain.Events
         }
 
         [JsonConstructor]
-        private RecordSetUpdated(
+        private ManualWasAdded(
+            string label,
             IReadOnlyCollection<RecordData> records)
             : this(
+                new ManualLabel(label),
                 new RecordSet(
                     records.Select(r => new Record(
                         RecordType.FromValue(r.Type),
                         new TimeToLive(r.TimeToLive),
                         new RecordLabel(r.Label),
-                        new RecordValue(r.Value))).ToList())) { }
+                        new RecordValue(r.Value))).ToList()))
+        { }
 
         public class RecordData
         {

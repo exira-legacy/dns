@@ -6,6 +6,8 @@ namespace Dns.Domain
     using Events;
     using Services.GoogleSuite;
     using Services.GoogleSuite.Events;
+    using Services.Manual;
+    using Services.Manual.Events;
 
     public partial class Domain : AggregateRootEntity
     {
@@ -18,10 +20,15 @@ namespace Dns.Domain
             return domain;
         }
 
+        public void AddManual(ManualLabel label, RecordSet records)
+        {
+            ApplyChange(new ManualWasAdded(label, records));
+            UpdateRecordSet();
+        }
+
         public void AddGoogleSuite(GoogleVerificationToken verificationToken)
         {
             ApplyChange(new GoogleSuiteWasAdded(verificationToken));
-
             UpdateRecordSet();
         }
 

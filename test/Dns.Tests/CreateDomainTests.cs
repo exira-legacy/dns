@@ -1,9 +1,10 @@
-namespace Dns.Tests.CreateDomain
+namespace Dns.Tests
 {
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
     using Domain.Commands;
     using Domain.Events;
+    using Infrastructure;
     using Xunit;
     using Xunit.Abstractions;
 

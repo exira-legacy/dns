@@ -1,4 +1,4 @@
-namespace Dns.Tests.AddGoogleSuite
+namespace Dns.Tests
 {
     using AutoFixture;
     using Be.Vlaanderen.Basisregisters.AggregateSource.Testing;
@@ -6,6 +6,7 @@ namespace Dns.Tests.AddGoogleSuite
     using Domain.Services.GoogleSuite;
     using Domain.Services.GoogleSuite.Commands;
     using Domain.Services.GoogleSuite.Events;
+    using Infrastructure;
     using Xunit;
     using Xunit.Abstractions;
     using DomainName = DomainName;
