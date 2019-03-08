@@ -59,6 +59,18 @@ namespace Dns.Domain
                         message.Command.ServiceId,
                         message.Command.VerificationToken);
                 });
+
+            For<RemoveService>()
+                .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)
+                .Handle(async (message, ct) =>
+                {
+                    var domains = getDomains();
+
+                    var domainName = message.Command.DomainName;
+                    var domain = await domains.GetAsync(domainName, ct);
+
+                    domain.RemoveService(message.Command.ServiceId);
+                });
         }
     }
 }

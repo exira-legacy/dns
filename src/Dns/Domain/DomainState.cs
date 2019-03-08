@@ -11,13 +11,14 @@ namespace Dns.Domain
     public partial class Domain
     {
         private DomainName _name;
-        private readonly List<IService> _services = new List<IService>();
+        private readonly Dictionary<ServiceId, IService> _services = new Dictionary<ServiceId, IService>();
 
         private Domain()
         {
             Register<DomainWasCreated>(When);
             Register<ManualWasAdded>(When);
             Register<GoogleSuiteWasAdded>(When);
+            Register<ServiceWasRemoved>(When);
         }
 
         private void When(DomainWasCreated @event)
@@ -30,6 +31,7 @@ namespace Dns.Domain
         private void When(ManualWasAdded @event)
         {
             _services.Add(
+                new ServiceId(@event.ServiceId),
                 new ManualService(
                     new ServiceId(@event.ServiceId),
                     new ManualLabel(@event.Label),
@@ -44,9 +46,15 @@ namespace Dns.Domain
         private void When(GoogleSuiteWasAdded @event)
         {
             _services.Add(
+                new ServiceId(@event.ServiceId),
                 new GoogleSuiteService(
                     new ServiceId(@event.ServiceId),
                     new GoogleVerificationToken(@event.VerificationToken)));
+        }
+
+        private void When(ServiceWasRemoved @event)
+        {
+            _services.Remove(new ServiceId(@event.ServiceId));
         }
     }
 }

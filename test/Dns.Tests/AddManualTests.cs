@@ -6,6 +6,7 @@ namespace Dns.Tests
     using Domain.Services.Manual;
     using Domain.Services.Manual.Commands;
     using Domain.Services.Manual.Events;
+    using Exceptions;
     using Infrastructure;
     using Xunit;
     using Xunit.Abstractions;
@@ -46,6 +47,22 @@ namespace Dns.Tests
                 .Then(domainName,
                     new ManualWasAdded(serviceId, label, recordset),
                     new RecordSetUpdated(manualService.GetRecords())));
+        }
+
+        [Fact]
+        public void adding_identical_manual_should_be_impossible()
+        {
+            var domainName = Fixture.Create<DomainName>();
+            var serviceId = Fixture.Create<ServiceId>();
+            var label = Fixture.Create<ManualLabel>();
+            var recordset = new RecordSet(Fixture.CreateMany<Record>(10));
+
+            Assert(new Scenario()
+                .Given(domainName,
+                    new DomainWasCreated(domainName),
+                    new ManualWasAdded(serviceId, label, recordset))
+                .When(new AddManual(domainName, serviceId, label, recordset))
+                .Throws(new ServiceAlreadyExistsException(serviceId)));
         }
     }
 }

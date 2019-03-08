@@ -4,6 +4,7 @@ namespace Dns.Domain
     using System;
     using System.Linq;
     using Events;
+    using Exceptions;
     using Services.GoogleSuite;
     using Services.GoogleSuite.Events;
     using Services.Manual;
@@ -22,21 +23,38 @@ namespace Dns.Domain
 
         public void AddManual(ServiceId serviceId, ManualLabel label, RecordSet records)
         {
+            CheckIfServiceAlreadyExists(serviceId);
             ApplyChange(new ManualWasAdded(serviceId, label, records));
             UpdateRecordSet();
         }
 
         public void AddGoogleSuite(ServiceId serviceId, GoogleVerificationToken verificationToken)
         {
+            CheckIfServiceAlreadyExists(serviceId);
             ApplyChange(new GoogleSuiteWasAdded(serviceId, verificationToken));
             UpdateRecordSet();
+        }
+
+        public void RemoveService(ServiceId serviceId)
+        {
+            if (!_services.ContainsKey(serviceId))
+                return;
+
+            ApplyChange(new ServiceWasRemoved(serviceId));
+            UpdateRecordSet();
+        }
+
+        private void CheckIfServiceAlreadyExists(ServiceId serviceId)
+        {
+            if (_services.ContainsKey(serviceId))
+                throw new ServiceAlreadyExistsException(serviceId);
         }
 
         private void UpdateRecordSet()
         {
             ApplyChange(
                 new RecordSetUpdated(
-                    _services.Aggregate(
+                    _services.Values.Aggregate(
                         new RecordSet(),
                         (r, service) => r.AddRecords(service.GetRecords()),
                         r => r)));
