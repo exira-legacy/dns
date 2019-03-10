@@ -11,7 +11,7 @@ namespace Dns.Importer
 
     public class DomainFetcher
     {
-        private const string DomainSql = "SELECT DomainId, ExternalId FROM Dns.Domain;";
+        private const string DomainSql = "SELECT DomainId, ExternalId, TopLevelDomain, SecondLevelDomain FROM Dns.Domain;";
         private const string RecordSql = "SELECT Type, HostName, TimeToLive, Value FROM Dns.ResourceRecord WHERE DomainId = @DomainId;";
 
         private readonly ILogger<DomainFetcher> _logger;
@@ -21,6 +21,8 @@ namespace Dns.Importer
         {
             public int DomainId { get; set; }
             public string ExternalId { get; set; }
+            public string TopLevelDomain { get; set; }
+            public string SecondLevelDomain { get; set; }
         }
 
         public class Record
@@ -46,14 +48,14 @@ namespace Dns.Importer
                 var domains = (await conn.QueryAsync<Domain>(DomainSql)).ToList();
                 var result = new Dictionary<Domain, List<Record>>();
 
-                _logger.LogInformation("Fetched {NumberOfDomains} domains.", domains.Count());
+                _logger.LogInformation("Fetched {NumberOfDomains} domains.", domains.Count);
                 foreach (var domain in domains)
                 {
                     result.Add(domain, new List<Record>());
 
                     var records = (await conn.QueryAsync<Record>(RecordSql, new { DomainId = domain.DomainId })).ToList();
 
-                    _logger.LogInformation("Fetched {NumberOfRecords} records for {Domain}.", records.Count(), domain.ExternalId);
+                    _logger.LogInformation("Fetched {NumberOfRecords} records for {Domain}.", records.Count, domain.ExternalId);
                     result[domain].AddRange(records);
                 }
 

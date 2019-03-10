@@ -54,6 +54,8 @@ namespace Dns.Importer
             {
                 var runner = container.GetRequiredService<DnsImporter>();
 
+                Console.WriteLine("Press ENTER to start import...");
+                Console.ReadLine();
                 await runner.StartAsync(ct);
 
                 logger.LogInformation("Running... Press CTRL + C to exit.");
