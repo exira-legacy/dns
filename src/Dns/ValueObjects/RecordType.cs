@@ -12,9 +12,12 @@ namespace Dns
     {
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         public static readonly RecordType
-            txt = new RecordType("txt", "TXT"),
+            ns = new RecordType("ns", "NS"),
+            a = new RecordType("a", "A"),
+            cname = new RecordType("cname", "CNAME"),
             mx = new RecordType("mx", "MX"),
-            cname = new RecordType("cname", "CNAME");
+            txt = new RecordType("txt", "TXT"),
+            spf = new RecordType("spf", "SPF");
 
         private RecordType(
             string type,
