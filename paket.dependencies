@@ -21,6 +21,10 @@ nuget Microsoft.Extensions.Http.Polly 2.2.0
 nuget Autofac 4.9.1
 nuget Autofac.Extensions.DependencyInjection 4.4.0
 
+nuget Dapper 1.60.1
+nuget Dapper.Contrib 1.60.1
+nuget MySqlConnector 0.49.3
+
 // BASE REGISTRIES STUFF
 nuget Be.Vlaanderen.Basisregisters.Build.Pipeline ~> 1.5
 nuget Be.Vlaanderen.Basisregisters.Testing.Infrastructure.Events ~> 1.0 content: true, copy_content_to_output_dir: always, copy_local: true

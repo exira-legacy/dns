@@ -12,6 +12,10 @@ Microsoft.Extensions.Http.Polly
 
 Autofac.Extensions.DependencyInjection
 
+Dapper
+Dapper.Contrib
+MySqlConnector
+
 Serilog
 Serilog.Sinks.Console
 Serilog.Sinks.File

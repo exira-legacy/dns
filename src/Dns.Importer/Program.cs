@@ -84,7 +84,13 @@ namespace Dns.Importer
             var tempProvider = services.BuildServiceProvider();
             var loggerFactory = tempProvider.GetService<ILoggerFactory>();
 
+            builder.RegisterInstance(configuration);
+
             builder.RegisterModule(new HttpModule(configuration, services, loggerFactory));
+
+            builder
+                .RegisterType<DomainFetcher>()
+                .SingleInstance();
 
             builder
                 .RegisterType<DnsImporter>()

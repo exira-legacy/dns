@@ -5,6 +5,7 @@ namespace Dns.Importer
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using Modules;
 
@@ -12,18 +13,26 @@ namespace Dns.Importer
     {
         private readonly ILogger<DnsImporter> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly DomainFetcher _domainFetcher;
 
         public DnsImporter(
             ILogger<DnsImporter> logger,
-            IHttpClientFactory httpClientFactory)
+            IHttpClientFactory httpClientFactory,
+            DomainFetcher domainFetcher)
         {
             _logger = logger;
             _httpClientFactory = httpClientFactory;
+            _domainFetcher = domainFetcher;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            // TODO: Implement
+            var domains = await _domainFetcher.FetchAsync();
+
+            foreach (var domain in domains)
+            {
+                // TODO: Implement
+            }
         }
 
         private void SendToApi(object stuff)
