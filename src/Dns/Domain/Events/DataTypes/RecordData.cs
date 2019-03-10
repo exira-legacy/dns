@@ -25,14 +25,14 @@ namespace Dns.Domain.Events
             string value)
             : this(
                 new Record(
-                    RecordType.FromValue(type),
+                    RecordType.FromValue(type.ToLowerInvariant()),
                     new TimeToLive(timeToLive),
                     new RecordLabel(label),
                     new RecordValue(value))) { }
 
         public Record ToRecord() =>
             new Record(
-                RecordType.FromValue(Type),
+                RecordType.FromValue(Type.ToLowerInvariant()),
                 new TimeToLive(TimeToLive),
                 new RecordLabel(Label),
                 new RecordValue(Value));

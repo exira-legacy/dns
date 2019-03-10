@@ -35,6 +35,40 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Add Manual Service",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\tserviceId: \"ccb10002-216e-426e-972f-9db98a4fdfec\",\n\tlabel: \"My Mail Settings\",\n\trecords: [\n\t\t{\n\t\t\ttype: \"mx\",\n\t\t\ttimeToLive: 60,\n\t\t\tlabel: \"@\",\n\t\t\tvalue: \"bla\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "http://localhost:1090/v1/domains/exira.com/services/manual",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "1090",
+					"path": [
+						"v1",
+						"domains",
+						"exira.com",
+						"services",
+						"manual"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
