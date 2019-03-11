@@ -1,36 +1,68 @@
 namespace Dns
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text.RegularExpressions;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Exceptions;
     using Newtonsoft.Json;
 
     public class RecordLabel : StringValueObject<RecordLabel>
     {
-        public const int MaxLength = 64; // TODO: Look up what the max length is
+        // TXT records can also contain _ and .
+        private static readonly Regex DnsLabelRegex = new Regex(@"^(?![0-9]+$)(?!-)[a-zA-Z0-9-]{0,63}(?<!-)$", RegexOptions.IgnoreCase);
+        private static readonly Regex DnsLabelTxtRegex = new Regex(@"^(?![0-9]+$)(?!-)[a-zA-Z0-9-_\.]{0,63}(?<!-)$", RegexOptions.IgnoreCase);
 
-        public RecordLabel([JsonProperty("value")] string label) : base(label?.ToLowerInvariant())
+        public const int MaxLength = 63;
+
+        public RecordLabel([JsonProperty("value")] string label) : base(label?.ToLowerInvariant().Trim())
         {
             if (string.IsNullOrWhiteSpace(label))
                 throw new EmptyRecordLabelException();
 
-            // TODO: Label has rules to follow, encode them! (no spaces, etc)
+            if (label.Length > MaxLength)
+                throw new RecordLabelTooLongException();
 
-            //Kan bestaat uit:
-            //@; root domein
-            //A tot Z ; drukletters
-            //a tot z ; kleine letters
-            //0 tot 9 ; cijfers
-            //- ; koppelteken
+            if (Value == "@")
+                return;
 
-            //Kan beginnen of eindigen met een letter
+            // We assume if it is a valid TXT label, it is also a valid normal label, a more strict check needs to happen at the Record level
+            if (DnsLabelTxtRegex.IsMatch(Value))
+                return;
 
-            //Kan beginnen of eindigen met een cijfer
+            // At this point, we know it is invalid, but for which reason?
+            var exceptions = new List<InvalidRecordLabelException>();
+            if (Value.StartsWith("-"))
+                exceptions.Add(new RecordLabelCannotStartWithDashException());
 
-            //Kan niet beginnen of eindigen met een '-'
+            if (Value.EndsWith("-"))
+                exceptions.Add(new RecordLabelCannotEndWithDashException());
 
-            //Kan niet bestaan uit allemaal cijfers
+            if (Value.All(char.IsDigit))
+                exceptions.Add(new RecordLabelCannotBeAllDigitsException());
 
-            //Kan tot 63 tekens lang zijn
+            // At this point, the only thing left are invalid characters
+            exceptions.Add(new RecordLabelContainsInvalidCharactersException());
+
+            throw new AggregateException("Record label contains validation errors.", exceptions);
+        }
+
+        public bool ValidateLabel(RecordType recordType)
+        {
+            if (Value == "@")
+                return true;
+
+            // We already validated using the TXT regex, so we know it is correct
+            if (recordType == RecordType.txt)
+                return true;
+
+            if (DnsLabelRegex.IsMatch(Value))
+                return true;
+
+            // TODO: Build an aggregateexception containing all the rules it violates?
+
+            return false;
         }
     }
 }

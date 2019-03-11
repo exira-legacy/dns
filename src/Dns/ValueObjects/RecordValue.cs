@@ -8,7 +8,7 @@ namespace Dns
     {
         public const int MaxLength = 64; // TODO: Look up what the max length is
 
-        public RecordValue([JsonProperty("value")] string value) : base(value)
+        public RecordValue([JsonProperty("value")] string value) : base(value?.Trim())
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new EmptyRecordValueException();

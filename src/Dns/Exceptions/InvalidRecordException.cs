@@ -25,6 +25,31 @@ namespace Dns.Exceptions
         public EmptyRecordLabelException() : base("Label of a record cannot be empty.") { }
     }
 
+    public class RecordLabelTooLongException : InvalidRecordLabelException
+    {
+        public RecordLabelTooLongException() : base($"Label of a record cannot be longer than {RecordLabel.MaxLength} characters.") { }
+    }
+
+    public class RecordLabelContainsInvalidCharactersException : InvalidRecordLabelException
+    {
+        public RecordLabelContainsInvalidCharactersException() : base("Label of a record contains invalid characters.") { }
+    }
+
+    public class RecordLabelCannotStartWithDashException : InvalidRecordLabelException
+    {
+        public RecordLabelCannotStartWithDashException() : base("Label of a record cannot start with a dash.") { }
+    }
+
+    public class RecordLabelCannotEndWithDashException : InvalidRecordLabelException
+    {
+        public RecordLabelCannotEndWithDashException() : base("Label of a record cannot end with a dash.") { }
+    }
+
+    public class RecordLabelCannotBeAllDigitsException : InvalidRecordLabelException
+    {
+        public RecordLabelCannotBeAllDigitsException() : base("Label of a record cannot consist out of digits only.") { }
+    }
+
     public class EmptyRecordValueException : InvalidRecordValueException
     {
         public EmptyRecordValueException() : base("Value of a record cannot be empty.") { }
