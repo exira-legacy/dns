@@ -12,6 +12,25 @@ namespace Dns
         {
             if (string.IsNullOrWhiteSpace(label))
                 throw new EmptyRecordLabelException();
+
+            // TODO: Label has rules to follow, encode them! (no spaces, etc)
+
+            //Kan bestaat uit:
+            //@; root domein
+            //A tot Z ; drukletters
+            //a tot z ; kleine letters
+            //0 tot 9 ; cijfers
+            //- ; koppelteken
+
+            //Kan beginnen of eindigen met een letter
+
+            //Kan beginnen of eindigen met een cijfer
+
+            //Kan niet beginnen of eindigen met een '-'
+
+            //Kan niet bestaan uit allemaal cijfers
+
+            //Kan tot 63 tekens lang zijn
         }
     }
 }

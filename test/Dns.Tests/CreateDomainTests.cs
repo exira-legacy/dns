@@ -30,5 +30,7 @@ namespace Dns.Tests
                 .Then(createDomainCommand.DomainName,
                     new DomainWasCreated(createDomainCommand.DomainName)));
         }
+
+        // TODO: Create test when creating an already existing domain
     }
 }
