@@ -55,6 +55,11 @@ namespace Dns.Exceptions
         public EmptyRecordValueException() : base("Value of a record cannot be empty.") { }
     }
 
+    public class RecordValueTooLongException : InvalidRecordLabelException
+    {
+        public RecordValueTooLongException() : base($"Value of a record cannot be longer than {RecordValue.MaxLength} characters.") { }
+    }
+
     public class NegativeTimeToLiveException : InvalidTimeToLiveException
     {
         public NegativeTimeToLiveException() : base("Time to live cannot be negative.") { }

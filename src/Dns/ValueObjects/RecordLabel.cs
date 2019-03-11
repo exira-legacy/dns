@@ -14,38 +14,25 @@ namespace Dns
         private static readonly Regex DnsLabelRegex = new Regex(@"^(?![0-9]+$)(?!-)[a-zA-Z0-9-]{0,63}(?<!-)$", RegexOptions.IgnoreCase);
         private static readonly Regex DnsLabelTxtRegex = new Regex(@"^(?![0-9]+$)(?!-)[a-zA-Z0-9-_\.]{0,63}(?<!-)$", RegexOptions.IgnoreCase);
 
+        // labels 63 octets or less
         public const int MaxLength = 63;
 
         public RecordLabel([JsonProperty("value")] string label) : base(label?.ToLowerInvariant().Trim())
         {
-            if (string.IsNullOrWhiteSpace(label))
+            if (string.IsNullOrWhiteSpace(Value))
                 throw new EmptyRecordLabelException();
 
-            if (label.Length > MaxLength)
+            if (Value.Length > MaxLength)
                 throw new RecordLabelTooLongException();
-
-            if (Value == "@")
-                return;
 
             // We assume if it is a valid TXT label, it is also a valid normal label, a more strict check needs to happen at the Record level
             if (DnsLabelTxtRegex.IsMatch(Value))
                 return;
 
-            // At this point, we know it is invalid, but for which reason?
-            var exceptions = new List<InvalidRecordLabelException>();
-            if (Value.StartsWith("-"))
-                exceptions.Add(new RecordLabelCannotStartWithDashException());
+            var validationErrors = ValidateFormat(Value);
 
-            if (Value.EndsWith("-"))
-                exceptions.Add(new RecordLabelCannotEndWithDashException());
-
-            if (Value.All(char.IsDigit))
-                exceptions.Add(new RecordLabelCannotBeAllDigitsException());
-
-            // At this point, the only thing left are invalid characters
-            exceptions.Add(new RecordLabelContainsInvalidCharactersException());
-
-            throw new AggregateException("Record label contains validation errors.", exceptions);
+            if (validationErrors.Any())
+                throw new AggregateException("Record label contains validation errors.", validationErrors);
         }
 
         public bool IsValid(RecordType recordType)
@@ -53,8 +40,40 @@ namespace Dns
             if (Value == "@")
                 return true;
 
-            // We already validated using the TXT regex, so we know it is correct
-            return recordType == RecordType.txt || DnsLabelRegex.IsMatch(Value);
+            if (recordType == RecordType.txt)
+            {
+                if (DnsLabelTxtRegex.IsMatch(Value))
+                    return true;
+            }
+            else
+            {
+                if (DnsLabelRegex.IsMatch(Value))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static List<InvalidRecordLabelException> ValidateFormat(string value)
+        {
+            if (value == "@")
+                return new List<InvalidRecordLabelException>();
+
+            var exceptions = new List<InvalidRecordLabelException>();
+
+            if (value.StartsWith("-"))
+                exceptions.Add(new RecordLabelCannotStartWithDashException());
+
+            if (value.EndsWith("-"))
+                exceptions.Add(new RecordLabelCannotEndWithDashException());
+
+            if (value.All(char.IsDigit))
+                exceptions.Add(new RecordLabelCannotBeAllDigitsException());
+
+            // At this point, the only thing left are invalid characters
+            exceptions.Add(new RecordLabelContainsInvalidCharactersException());
+
+            return exceptions;
         }
     }
 }

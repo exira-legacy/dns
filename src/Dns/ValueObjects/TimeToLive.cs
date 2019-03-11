@@ -6,7 +6,8 @@ namespace Dns
 
     public class TimeToLive : IntegerValueObject<TimeToLive>
     {
-        public const int MaxValue = int.MaxValue; // TODO: Look up what the max value is
+        /// It is hereby specified that a TTL value is an unsigned number, with a minimum value of 0, and a maximum value of 2147483647.
+        public const int MaxValue = int.MaxValue;
 
         public TimeToLive([JsonProperty("value")] int timeToLive) : base(timeToLive)
         {

@@ -6,7 +6,7 @@ namespace Dns.Tests
     public class RecordValueTests
     {
         [Fact]
-        public void label_cannot_be_empty()
+        public void value_cannot_be_empty()
         {
             void NullValue() => new RecordValue(null);
 
@@ -14,6 +14,17 @@ namespace Dns.Tests
 
             Assert.NotNull(ex);
             Assert.IsType<EmptyRecordValueException>(ex);
+        }
+
+        [Fact]
+        public void value_cannot_be_too_long()
+        {
+            void LongValue() => new RecordValue(new string('a', RecordValue.MaxLength + 1));
+
+            var ex = Record.Exception(LongValue);
+
+            Assert.NotNull(ex);
+            Assert.IsType<RecordValueTooLongException>(ex);
         }
 
         // TODO: Add test for invalid labels
