@@ -44,7 +44,7 @@ namespace Dns
         private TopLevelDomain(
             string extension,
             string displayName,
-            string fullName) : base(extension, displayName)
+            string fullName) : base(extension?.ToLowerInvariant(), displayName)
             => FullName = fullName;
     }
 }

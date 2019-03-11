@@ -3,6 +3,7 @@ namespace Dns
     using System;
     using System.Collections.Generic;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
+    using Exceptions;
 
     public class Record : ValueObject<Record>
     {
@@ -22,6 +23,9 @@ namespace Dns
             TimeToLive = timeToLive ?? throw new ArgumentNullException(nameof(timeToLive), "Time to live of record is missing.");
             Label = label ?? throw new ArgumentNullException(nameof(label), "Label of record is missing.");
             Value = value ?? throw new ArgumentNullException(nameof(value), "Value of record is missing.");
+
+            if (!label.IsValid(type))
+                throw new InvalidRecordLabelException("Label of record is invalid for the given type of record.");
         }
 
         protected override IEnumerable<object> Reflect()

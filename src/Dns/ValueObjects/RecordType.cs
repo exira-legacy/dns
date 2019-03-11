@@ -21,6 +21,6 @@ namespace Dns
 
         private RecordType(
             string type,
-            string displayName) : base(type, displayName) { }
+            string displayName) : base(type?.ToLowerInvariant(), displayName) { }
     }
 }

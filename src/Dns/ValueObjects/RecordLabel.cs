@@ -48,21 +48,13 @@ namespace Dns
             throw new AggregateException("Record label contains validation errors.", exceptions);
         }
 
-        public bool ValidateLabel(RecordType recordType)
+        public bool IsValid(RecordType recordType)
         {
             if (Value == "@")
                 return true;
 
             // We already validated using the TXT regex, so we know it is correct
-            if (recordType == RecordType.txt)
-                return true;
-
-            if (DnsLabelRegex.IsMatch(Value))
-                return true;
-
-            // TODO: Build an aggregateexception containing all the rules it violates?
-
-            return false;
+            return recordType == RecordType.txt || DnsLabelRegex.IsMatch(Value);
         }
     }
 }
