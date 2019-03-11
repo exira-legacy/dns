@@ -24,8 +24,15 @@ namespace Dns
             Label = label ?? throw new ArgumentNullException(nameof(label), "Label of record is missing.");
             Value = value ?? throw new ArgumentNullException(nameof(value), "Value of record is missing.");
 
-            if (!label.IsValid(type))
-                throw new InvalidRecordLabelException("Label of record is invalid for the given type of record.");
+            if (!label.TryValidate(type, out var labelExceptions))
+                throw new InvalidRecordLabelException(
+                    "Label of record is invalid for the given type of record.",
+                    new AggregateException("Record label contains validation errors.", labelExceptions));
+
+            if (!value.TryValidate(type, out var valueExceptions))
+                throw new InvalidRecordValueException(
+                    "Value of record is invalid for the given type of record.",
+                    new AggregateException("Record value contains validation errors.", valueExceptions));
         }
 
         protected override IEnumerable<object> Reflect()

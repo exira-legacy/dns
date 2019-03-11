@@ -1,5 +1,6 @@
 namespace Dns
 {
+    using System.Collections.Generic;
     using System.Text.RegularExpressions;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Exceptions;
@@ -26,8 +27,13 @@ namespace Dns
             // TODO: Additional rules depend on the record type!
         }
 
-        public bool IsValid(RecordType recordType)
+        public bool TryValidate(RecordType recordType, out List<InvalidRecordValueException> exceptions)
         {
+            exceptions = new List<InvalidRecordValueException>();
+            return true;
+
+            // TODO: Build exceptions + tests
+
             if (recordType == RecordType.a)
                 return IsValidAValue(Value);
 

@@ -1,18 +1,26 @@
 namespace Dns.Exceptions
 {
+    using System;
+
     public class InvalidRecordException : DnsException
     {
         public InvalidRecordException(string message) : base(message) { }
+
+        public InvalidRecordException(string message, Exception inner) : base(message, inner) { }
     }
 
     public class InvalidRecordLabelException : InvalidRecordException
     {
         public InvalidRecordLabelException(string message) : base(message) { }
+
+        public InvalidRecordLabelException(string message, Exception inner) : base(message, inner) { }
     }
 
     public class InvalidRecordValueException : InvalidRecordException
     {
         public InvalidRecordValueException(string message) : base(message) { }
+
+        public InvalidRecordValueException(string message, Exception inner) : base(message, inner) { }
     }
 
     public class InvalidTimeToLiveException : InvalidRecordException

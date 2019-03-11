@@ -54,10 +54,17 @@ namespace Dns.Tests
             Assert.Contains(nameof(Dns.Record.Value).ToLowerInvariant(), ex.Message.ToLowerInvariant());
         }
 
-        [Fact]
-        public void label_cannot_be_invalid()
+        [Theory]
+        [InlineData("A", 3600, "a.a", "bla")]
+        [InlineData("A", 3600, "a_a", "bla")]
+        [InlineData("TXT", 3600, "a!a", "bla")]
+        public void label_cannot_be_invalid(string recordType, int timeToLive, string recordLabel, string recordValue)
         {
-            void InvalidRecord() => new Dns.Record(RecordType.a, new TimeToLive(3600), new RecordLabel("a.a"), new RecordValue("bla"));
+            void InvalidRecord() => new Dns.Record(
+                RecordType.FromValue(recordType.ToLowerInvariant()),
+                new TimeToLive(timeToLive),
+                new RecordLabel(recordLabel),
+                new RecordValue(recordValue));
 
             var ex = Record.Exception(InvalidRecord);
 
@@ -69,6 +76,7 @@ namespace Dns.Tests
         [InlineData("A", 3600, "@", "127.0.0.1")]
         [InlineData("CNAME", 3600, "www", "exira.com.")]
         [InlineData("TXT", 3600, "@", "blablabla")]
+        [InlineData("TXT", 3600, "_bla", "blablabla")]
         [InlineData("spf", 9000, "@", "blabla bla")]
         public void record_must_be_valid(string recordType, int timeToLive, string recordLabel, string recordValue)
         {

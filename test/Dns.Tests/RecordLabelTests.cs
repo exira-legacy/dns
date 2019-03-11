@@ -36,10 +36,11 @@ namespace Dns.Tests
             var ex = Record.Exception(StartDashLabel);
 
             Assert.NotNull(ex);
-            Assert.IsType<AggregateException>(ex);
+            Assert.IsType<InvalidRecordLabelException>(ex);
 
             Assert.NotNull(ex.InnerException);
-            Assert.IsType<RecordLabelCannotStartWithDashException>(ex.InnerException);
+            Assert.IsType<AggregateException>(ex.InnerException);
+            Assert.IsType<RecordLabelCannotStartWithDashException>(ex.InnerException.InnerException);
         }
 
         [Fact]
@@ -50,10 +51,11 @@ namespace Dns.Tests
             var ex = Record.Exception(EndDashLabel);
 
             Assert.NotNull(ex);
-            Assert.IsType<AggregateException>(ex);
+            Assert.IsType<InvalidRecordLabelException>(ex);
 
             Assert.NotNull(ex.InnerException);
-            Assert.IsType<RecordLabelCannotEndWithDashException>(ex.InnerException);
+            Assert.IsType<AggregateException>(ex.InnerException);
+            Assert.IsType<RecordLabelCannotEndWithDashException>(ex.InnerException.InnerException);
         }
 
         [Fact]
@@ -64,10 +66,11 @@ namespace Dns.Tests
             var ex = Record.Exception(DigitsLabel);
 
             Assert.NotNull(ex);
-            Assert.IsType<AggregateException>(ex);
+            Assert.IsType<InvalidRecordLabelException>(ex);
 
             Assert.NotNull(ex.InnerException);
-            Assert.IsType<RecordLabelCannotBeAllDigitsException>(ex.InnerException);
+            Assert.IsType<AggregateException>(ex.InnerException);
+            Assert.IsType<RecordLabelCannotBeAllDigitsException>(ex.InnerException.InnerException);
         }
 
         [Fact]
@@ -78,10 +81,11 @@ namespace Dns.Tests
             var ex = Record.Exception(InvalidLabel);
 
             Assert.NotNull(ex);
-            Assert.IsType<AggregateException>(ex);
+            Assert.IsType<InvalidRecordLabelException>(ex);
 
             Assert.NotNull(ex.InnerException);
-            Assert.IsType<RecordLabelContainsInvalidCharactersException>(ex.InnerException);
+            Assert.IsType<AggregateException>(ex.InnerException);
+            Assert.IsType<RecordLabelContainsInvalidCharactersException>(ex.InnerException.InnerException);
         }
 
         [Theory]

@@ -32,11 +32,15 @@ namespace Dns
             var validationErrors = ValidateFormat(Value);
 
             if (validationErrors.Any())
-                throw new AggregateException("Record label contains validation errors.", validationErrors);
+                throw new InvalidRecordLabelException(
+                    "Record label contains validation errors.",
+                    new AggregateException(validationErrors));
         }
 
-        public bool IsValid(RecordType recordType)
+        public bool TryValidate(RecordType recordType, out List<InvalidRecordLabelException> exceptions)
         {
+            exceptions = new List<InvalidRecordLabelException>();
+
             if (Value == "@")
                 return true;
 
@@ -51,6 +55,7 @@ namespace Dns
                     return true;
             }
 
+            exceptions = ValidateFormat(Value);
             return false;
         }
 
