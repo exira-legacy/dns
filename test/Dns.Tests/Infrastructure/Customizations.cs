@@ -2,6 +2,7 @@ namespace Dns.Tests.Infrastructure
 {
     using System;
     using System.Linq;
+    using System.Net;
     using AutoFixture;
     using AutoFixture.Dsl;
     using Domain.Services.GoogleSuite;
@@ -39,14 +40,14 @@ namespace Dns.Tests.Infrastructure
             fixture.Customize<RecordLabel>(composer =>
                 composer.FromFactory(generator =>
                     new RecordLabel(new string(
-                        (char)generator.Next(97, 123), // a-z
+                        (char) generator.Next(97, 123), // a-z
                         generator.Next(1, RecordLabel.MaxLength)))));
 
         public static void CustomizeRecordValue(this IFixture fixture) =>
             fixture.Customize<RecordValue>(composer =>
                 composer.FromFactory(generator =>
                     new RecordValue(new string(
-                        (char)generator.Next(97, 123), // a-z
+                        (char) generator.Next(97, 123), // a-z
                         generator.Next(1, RecordValue.MaxLength)))));
 
         public static void CustomizeTimeToLive(this IFixture fixture) =>
@@ -56,11 +57,37 @@ namespace Dns.Tests.Infrastructure
 
         public static void CustomizeRecord(this IFixture fixture) =>
             fixture.Customize<Record>(composer => composer.FromFactory(_ =>
-                new Record(
-                    fixture.Create<RecordType>(),
+            {
+                var recordType = fixture.Create<RecordType>();
+                return new Record(
+                    recordType,
                     fixture.Create<TimeToLive>(),
                     fixture.Create<RecordLabel>(),
-                    fixture.Create<RecordValue>())));
+                    fixture.CreateRecordValue(recordType));
+            }));
+
+    private static RecordValue CreateRecordValue(this IFixture fixture, RecordType recordType)
+        {
+            if (recordType == RecordType.ns)
+                return new RecordValue($"{fixture.Create<RecordValue>()}.");
+
+            if (recordType == RecordType.a)
+                return new RecordValue(fixture.Create<IPAddress>().ToString());
+
+            if (recordType == RecordType.cname)
+                return new RecordValue($"{fixture.Create<RecordValue>()}.");
+
+            if (recordType == RecordType.mx)
+                return new RecordValue($"10 {fixture.Create<RecordValue>()}.");
+
+            if (recordType == RecordType.txt)
+                return fixture.Create<RecordValue>();
+
+            if (recordType == RecordType.spf)
+                return fixture.Create<RecordValue>();
+
+            throw new ArgumentException("Invalid RecordType.", nameof(recordType));
+        }
 
         public static void CustomizeGoogleVerificationToken(this IFixture fixture)
         {

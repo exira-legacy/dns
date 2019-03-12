@@ -73,6 +73,35 @@ namespace Dns.Tests
         }
 
         [Theory]
+        [InlineData("A", 3600, "www", "bla", typeof(RecordValueARecordMustBeValidIpException))]
+        [InlineData("CNAME", 3600, "www", "-blabla.", typeof(RecordValueCNameRecordInvalidHostnameException))]
+        [InlineData("CNAME", 3600, "www", "-www-", typeof(RecordValueCNameRecordInvalidLabelException))]
+        [InlineData("MX", 3600, "www", "w www", typeof(RecordValueMxRecordMustHaveIntegerPriorityException))]
+        [InlineData("MX", 3600, "www", "-10 www", typeof(RecordValueMxRecordMustHaveIntegerPriorityException))]
+        [InlineData("MX", 3600, "www", "10", typeof(RecordValueMxRecordMustHavePriorityAndHostnameException))]
+        [InlineData("MX", 3600, "www", "10 -blablabla.", typeof(RecordValueMxRecordInvalidHostnameException))]
+        [InlineData("MX", 3600, "www", "10 -www-", typeof(RecordValueMxRecordInvalidLabelException))]
+        [InlineData("NS", 3600, "www", "-blablabla.", typeof(RecordValueNsRecordInvalidHostnameException))]
+        [InlineData("NS", 3600, "www", "-www-", typeof(RecordValueNsRecordInvalidLabelException))]
+        public void value_cannot_be_invalid(string recordType, int timeToLive, string recordLabel, string recordValue, Type exceptionType)
+        {
+            void InvalidRecord() => new Dns.Record(
+                RecordType.FromValue(recordType.ToLowerInvariant()),
+                new TimeToLive(timeToLive),
+                new RecordLabel(recordLabel),
+                new RecordValue(recordValue));
+
+            var ex = Record.Exception(InvalidRecord);
+
+            Assert.NotNull(ex);
+            Assert.IsType<InvalidRecordValueException>(ex);
+
+            Assert.NotNull(ex.InnerException);
+            Assert.IsType<AggregateException>(ex.InnerException);
+            Assert.IsType(exceptionType, ex.InnerException.InnerException);
+        }
+
+        [Theory]
         [InlineData("A", 3600, "@", "127.0.0.1")]
         [InlineData("CNAME", 3600, "www", "exira.com.")]
         [InlineData("TXT", 3600, "@", "blablabla")]
