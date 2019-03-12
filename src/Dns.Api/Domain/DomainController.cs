@@ -11,6 +11,7 @@ namespace Dns.Api.Domain
     using Microsoft.AspNetCore.Mvc;
     using Newtonsoft.Json.Converters;
     using Requests;
+    using Responses;
     using Swashbuckle.AspNetCore.Filters;
 
     [ApiVersion("1.0")]
@@ -53,7 +54,6 @@ namespace Dns.Api.Domain
             // TODO: Sending null for top level domain should give a decent error, not 500
             // TODO: Apikey description in documentation should be translatable
             // TODO: Add bad format response code if it is not json
-            // TODO: Add endpoint to POST services to (like google apps, etc)
             // TODO: Add endpoint to list services
 
             return Accepted(
@@ -63,6 +63,38 @@ namespace Dns.Api.Domain
                     command,
                     GetMetadata(),
                     cancellationToken));
+        }
+
+        /// <summary>
+        /// List services of a domain.
+        /// </summary>
+        /// <param name="secondLevelDomain">Second level domain of the domain to list services for.</param>
+        /// <param name="topLevelDomain">Top level domain of the domain to list services for.</param>
+        /// <param name="cancellationToken"></param>
+        /// <response code="200">If the domain is found.</response>
+        /// <response code="404">If the domain does not exist.</response>
+        /// <response code="500">If an internal error has occurred.</response>
+        /// <returns></returns>
+        [HttpPost("{secondLevelDomain}.{topLevelDomain}/services")]
+        [ProducesResponseType(typeof(DomainServiceListResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(DomainServiceListResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(DomainNotFoundResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        public async Task<IActionResult> ListServices(
+            //[FromServices] DnsContext context,
+            [FromRoute] string secondLevelDomain,
+            [FromRoute] string topLevelDomain,
+            CancellationToken cancellationToken = default)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            // TODO: Implement getting from context
+
+            return Ok(
+                new DomainServiceListResponse());
         }
     }
 
