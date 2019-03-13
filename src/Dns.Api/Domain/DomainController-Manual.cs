@@ -53,7 +53,7 @@ namespace Dns.Api.Domain
                 request);
 
             return Accepted(
-                $"/v1/domains/{command.DomainName}",
+                $"/v1/domains/{command.DomainName}/services/{command.ServiceId}",
                 await bus.Dispatch(
                     commandId,
                     command,
