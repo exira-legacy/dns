@@ -10,6 +10,7 @@ namespace Dns.Api.Domain
     using Microsoft.AspNetCore.Mvc;
     using Newtonsoft.Json.Converters;
     using Requests;
+    using Responses;
     using Swashbuckle.AspNetCore.Filters;
 
     public partial class DomainController

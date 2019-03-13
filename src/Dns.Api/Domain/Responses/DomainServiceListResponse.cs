@@ -3,8 +3,6 @@ namespace Dns.Api.Domain.Responses
     using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
-    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using Microsoft.AspNetCore.Http;
     using Swashbuckle.AspNetCore.Filters;
 
     [DataContract(Name = "DomainServices", Namespace = "")]
@@ -60,18 +58,6 @@ namespace Dns.Api.Domain.Responses
                     new DomainServiceListItemResponse(new ServiceId(Guid.NewGuid()), "manual", "My Mail Services"),
                     new DomainServiceListItemResponse(new ServiceId(Guid.NewGuid()), "googlesuite", "Google Suite")
                 }
-            };
-    }
-
-    public class DomainNotFoundResponseExamples : IExamplesProvider
-    {
-        public object GetExamples()
-            => new BasicApiProblem
-            {
-                HttpStatus = StatusCodes.Status404NotFound,
-                Title = BasicApiProblem.DefaultTitle,
-                Detail = "Domain does not exist.",
-                ProblemInstanceUri = BasicApiProblem.GetProblemNumber()
             };
     }
 }
