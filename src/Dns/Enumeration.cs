@@ -122,7 +122,7 @@ namespace Dns
         public static bool TryParse(TValue value, out TEnumeration result)
             => TryParse(e => e.ValueEquals(value), out result);
 
-        public static bool TryParse(string displayName, out TEnumeration result)
+        public static bool TryParseDisplayName(string displayName, out TEnumeration result)
             => TryParse(e => e.DisplayName == displayName, out result);
 
         protected virtual bool ValueEquals(TValue value)

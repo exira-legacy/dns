@@ -15,8 +15,13 @@ namespace Dns.Exceptions
         public EmptySecondLevelDomainException() : base("Name of a second level domain cannot be empty.") { }
     }
 
-    public class InvalidHostnameException : InvalidSecondLevelDomainException
+    public class SecondLevelDomainTooLongException : InvalidSecondLevelDomainException
     {
-        public InvalidHostnameException() : base("Name of a second level domain must be a valid hostname.") { }
+        public SecondLevelDomainTooLongException() : base($"Name of a second level domain cannot be longer than {SecondLevelDomain.MaxLength} characters.") { }
+    }
+
+    public class InvalidHostNameException : InvalidSecondLevelDomainException
+    {
+        public InvalidHostNameException() : base("Name of a second level domain must be a valid hostname.") { }
     }
 }

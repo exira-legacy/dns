@@ -3,6 +3,7 @@ namespace Dns.Api.Tests
     using System.Threading.Tasks;
     using Dns.Domain.Commands;
     using Domain.Requests;
+    using FluentValidation.TestHelper;
     using Infrastructure;
     using Xunit;
     using Xunit.Abstractions;
@@ -12,7 +13,29 @@ namespace Dns.Api.Tests
         public CreateDomainTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
         [Fact]
-        public async Task Test()
+        public void should_validate_request()
+        {
+            var validator = new CreateDomainRequestValidator();
+
+            validator.ShouldHaveValidationErrorFor(x => x.TopLevelDomain, null as string);
+            validator.ShouldHaveValidationErrorFor(x => x.TopLevelDomain, "bla");
+
+            validator.ShouldHaveValidationErrorFor(x => x.SecondLevelDomain, null as string);
+            validator.ShouldHaveValidationErrorFor(x => x.SecondLevelDomain, "bla bla");
+            validator.ShouldHaveValidationErrorFor(x => x.SecondLevelDomain, new string('a', SecondLevelDomain.MaxLength + 10));
+
+            var validRequest = new CreateDomainRequest
+            {
+                SecondLevelDomain = "exira",
+                TopLevelDomain = "com"
+            };
+
+            validator.ShouldNotHaveValidationErrorFor(x => x.TopLevelDomain, validRequest);
+            validator.ShouldNotHaveValidationErrorFor(x => x.SecondLevelDomain, validRequest);
+        }
+
+        [Fact]
+        public async Task should_create_a_correct_command()
         {
             var request = new CreateDomainRequest
             {

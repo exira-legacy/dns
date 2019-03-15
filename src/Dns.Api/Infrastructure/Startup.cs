@@ -50,7 +50,8 @@ namespace Dns.Api.Infrastructure
                     {
                         typeof(Startup).GetTypeInfo().Assembly.GetName().Name,
                     },
-                    _configuration.GetSection("Cors").GetChildren().Select(c => c.Value).ToArray());
+                    _configuration.GetSection("Cors").GetChildren().Select(c => c.Value).ToArray(),
+                    fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
 
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterModule(new ApiModule(_configuration, services));

@@ -24,7 +24,18 @@ namespace Dns.Tests
             var ex = Record.Exception(TooLongDomain);
 
             Assert.NotNull(ex);
-            Assert.IsType<InvalidHostnameException>(ex);
+            Assert.IsType<SecondLevelDomainTooLongException>(ex);
+        }
+
+        [Fact]
+        public void domain_cannot_be_invalid_hostname()
+        {
+            void InvalidDomain() => new SecondLevelDomain("aaa aaa");
+
+            var ex = Record.Exception(InvalidDomain);
+
+            Assert.NotNull(ex);
+            Assert.IsType<InvalidHostNameException>(ex);
         }
 
         [Theory]
