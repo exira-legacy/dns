@@ -23,7 +23,13 @@ namespace Dns.Api.Domain
 
         public static IRuleBuilderOptions<T, string> ValidTopLevelDomain<T>(this IRuleBuilder<T, string> ruleBuilder)
             => ruleBuilder
-                .Must(property => TopLevelDomain.TryParse(property, out _))
-                .WithMessage($"Top Level Domain must be one of {string.Join(", ", TopLevelDomain.GetAll().Select(x => $"'{x.Value}'"))}.");
+                .ValidEnumeration<T, TopLevelDomain, InvalidTopLevelDomainException>();
+
+        public static IRuleBuilderOptions<T, string> ValidEnumeration<T, TEnum, TException>(this IRuleBuilder<T, string> ruleBuilder)
+            where TEnum : Enumeration<TEnum, string, TException>
+            where TException : EnumerationException
+            => ruleBuilder
+                .Must(property => Enumeration<TEnum, string, TException>.TryParse(property, out _))
+                .WithMessage($"{{PropertyName}} must be one of {string.Join(", ", Enumeration<TEnum, string, TException>.GetAll().Select(x => $"'{x.Value}'"))}.");
     }
 }
