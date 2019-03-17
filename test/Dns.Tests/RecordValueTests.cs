@@ -1,6 +1,5 @@
 namespace Dns.Tests
 {
-    using System.Net;
     using Exceptions;
     using Xunit;
 
@@ -30,6 +29,8 @@ namespace Dns.Tests
 
         [Theory]
         [InlineData("10 aspmx.l.google.com.")]
+        [InlineData("e6363c95fb8f4ec8febf25398c7fe069e5836ffc.comodoca.com.")]
+        [InlineData("10 5d7ae46fe28a8947ba34c21a385dce.pamx1.hotmail.com.")]
         [InlineData("10.0.0.7")]
         [InlineData("google-site-verification=gn9B2LMgMSL20TH2RIHf3lLscp2unRMFkoSpQ5qwC58")]
         [InlineData("keybase-site-verification=llhHFoXIFGOzl8Boebxt5DTjY7HsMW2fZHY2EroVNaU")]

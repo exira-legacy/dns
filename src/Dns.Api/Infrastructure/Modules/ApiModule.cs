@@ -2,6 +2,7 @@ namespace Dns.Api.Infrastructure.Modules
 {
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
+    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
     using Microsoft.Extensions.Configuration;
@@ -26,15 +27,13 @@ namespace Dns.Api.Infrastructure.Modules
             var eventSerializerSettings = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
 
             containerBuilder
-                .RegisterModule(new LoggingModule(_configuration, _services));
-
-            containerBuilder
-                .RegisterModule(new EventHandlingModule(typeof(DomainAssemblyMarker).Assembly, eventSerializerSettings));
-
-            containerBuilder
+                .RegisterModule(new LoggingModule(_configuration, _services))
+                .RegisterModule(new DataDogModule(_configuration))
+                .RegisterModule(new EventHandlingModule(typeof(DomainAssemblyMarker).Assembly, eventSerializerSettings))
                 .RegisterModule(new CommandHandlingModule(_configuration));
 
-            containerBuilder.Populate(_services);
+            containerBuilder
+                .Populate(_services);
         }
     }
 }

@@ -58,6 +58,7 @@ namespace Dns.Tests
         [InlineData("A", 3600, "a.a", "bla")]
         [InlineData("A", 3600, "a_a", "bla")]
         [InlineData("TXT", 3600, "a!a", "bla")]
+        [InlineData("CNAME", 3600, "a!a", "bla")]
         public void label_cannot_be_invalid(string recordType, int timeToLive, string recordLabel, string recordValue)
         {
             void InvalidRecord() => new Dns.Record(
@@ -104,6 +105,7 @@ namespace Dns.Tests
         [Theory]
         [InlineData("A", 3600, "@", "127.0.0.1")]
         [InlineData("CNAME", 3600, "www", "exira.com.")]
+        [InlineData("CNAME", 3600, "k1._domainkey", "exira.com.")]
         [InlineData("TXT", 3600, "@", "blablabla")]
         [InlineData("TXT", 3600, "_bla", "blablabla")]
         [InlineData("spf", 9000, "@", "blabla bla")]

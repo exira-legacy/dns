@@ -10,9 +10,9 @@ namespace Dns
 
     public class RecordLabel : StringValueObject<RecordLabel>
     {
-        // TXT records can also contain _ and .
+        // TXT and CNAME records can also contain _ and .
         private static readonly Regex DnsLabelRegex = new Regex(@"^(?![0-9]+$)(?!-)[a-zA-Z0-9-]{0,63}(?<!-)$", RegexOptions.IgnoreCase);
-        private static readonly Regex DnsLabelTxtRegex = new Regex(@"^(?![0-9]+$)(?!-)[a-zA-Z0-9-_\.]{0,63}(?<!-)$", RegexOptions.IgnoreCase);
+        private static readonly Regex DnsLabelRelaxedRegex = new Regex(@"^(?![0-9]+$)(?!-)[a-zA-Z0-9-_\.]{0,63}(?<!-)$", RegexOptions.IgnoreCase);
 
         // labels 63 octets or less
         public const int MaxLength = 63;
@@ -26,7 +26,7 @@ namespace Dns
                 throw new RecordLabelTooLongException();
 
             // We assume if it is a valid TXT label, it is also a valid normal label, a more strict check needs to happen at the Record level
-            if (DnsLabelTxtRegex.IsMatch(Value))
+            if (DnsLabelRelaxedRegex.IsMatch(Value))
                 return;
 
             var validationErrors = ValidateFormat(Value);
@@ -44,9 +44,9 @@ namespace Dns
             if (Value == "@")
                 return true;
 
-            if (recordType == RecordType.txt)
+            if (recordType == RecordType.txt || recordType == RecordType.cname)
             {
-                if (DnsLabelTxtRegex.IsMatch(Value))
+                if (DnsLabelRelaxedRegex.IsMatch(Value))
                     return true;
             }
             else
