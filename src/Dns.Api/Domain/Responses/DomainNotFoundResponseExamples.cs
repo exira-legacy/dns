@@ -6,12 +6,14 @@ namespace Dns.Api.Domain.Responses
 
     public class DomainNotFoundResponseExamples : IExamplesProvider
     {
+        public static string Message = "Domain does not exist.";
+
         public object GetExamples()
             => new BasicApiProblem
             {
                 HttpStatus = StatusCodes.Status404NotFound,
                 Title = BasicApiProblem.DefaultTitle,
-                Detail = "Domain does not exist.",
+                Detail = Message,
                 ProblemInstanceUri = BasicApiProblem.GetProblemNumber()
             };
     }

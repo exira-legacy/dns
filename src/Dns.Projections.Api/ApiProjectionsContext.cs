@@ -9,6 +9,7 @@ namespace Dns.Projections.Api
         public override string ProjectionStateSchema => Schema.Api;
 
         public DbSet<DomainDetail.DomainDetail> DomainDetails { get; set; }
+        public DbSet<DomainList.DomainList> DomainList { get; set; }
 
         // This needs to be here to please EF
         public ApiProjectionsContext() { }

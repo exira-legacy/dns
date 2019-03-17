@@ -2,6 +2,7 @@ namespace Dns.Api.Domain.Responses
 {
     using System.Collections.Generic;
     using System.Runtime.Serialization;
+    using Projections.Api.DomainList;
     using Swashbuckle.AspNetCore.Filters;
 
     [DataContract(Name = "Domains", Namespace = "")]
@@ -24,10 +25,14 @@ namespace Dns.Api.Domain.Responses
         public string Name { get; set; }
 
         public DomainListItemResponse(
-            DomainName domainName)
-        {
-            Name = domainName;
-        }
+            DomainList domainList) :
+            this(
+                new DomainName(
+                    new SecondLevelDomain(domainList.SecondLevelDomain),
+                    TopLevelDomain.FromValue(domainList.TopLevelDomain))) { }
+
+        public DomainListItemResponse(
+            DomainName domainName) => Name = domainName;
     }
 
     public class DomainListResponseExamples : IExamplesProvider
@@ -37,8 +42,8 @@ namespace Dns.Api.Domain.Responses
             {
                 Domains = new List<DomainListItemResponse>
                 {
-                    new DomainListItemResponse(new DomainName(new SecondLevelDomain("exira"),  TopLevelDomain.com)),
-                    new DomainListItemResponse(new DomainName(new SecondLevelDomain("cumps"),  TopLevelDomain.be)),
+                    new DomainListItemResponse(new DomainName(new SecondLevelDomain("exira"), TopLevelDomain.com)),
+                    new DomainListItemResponse(new DomainName(new SecondLevelDomain("cumps"), TopLevelDomain.be)),
                 }
             };
     }

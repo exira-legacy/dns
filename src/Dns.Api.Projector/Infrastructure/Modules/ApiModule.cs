@@ -14,6 +14,7 @@ namespace Dns.Api.Projector.Infrastructure.Modules
     using Dns.Infrastructure;
     using Dns.Projections.Api;
     using Dns.Projections.Api.DomainDetail;
+    using Dns.Projections.Api.DomainList;
 
     public class ApiModule : Module
     {
@@ -71,7 +72,7 @@ namespace Dns.Api.Projector.Infrastructure.Modules
                     _loggerFactory));
 
             builder.RegisterProjections<DomainDetailProjections, ApiProjectionsContext>();
-            //builder.RegisterProjections<DomainListProjections, ApiProjectionsContext>();
+            builder.RegisterProjections<DomainListProjections, ApiProjectionsContext>();
         }
     }
 }

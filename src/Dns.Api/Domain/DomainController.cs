@@ -1,16 +1,22 @@
 namespace Dns.Api.Domain
 {
     using System;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Infrastructure;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
     using Newtonsoft.Json.Converters;
     using Projections.Api;
+    using Query;
     using Requests;
     using Responses;
     using Swashbuckle.AspNetCore.Filters;
@@ -84,13 +90,24 @@ namespace Dns.Api.Domain
             [FromServices] ApiProjectionsContext context,
             CancellationToken cancellationToken = default)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            var filtering = Request.ExtractFilteringRequest<DomainFilter>();
+            var sorting = Request.ExtractSortingRequest();
+            var pagination = Request.ExtractPaginationRequest();
 
-            // TODO: Implement getting from context
+            var pagedMunicipalities = new DomainListQuery(context)
+                .Fetch(filtering, sorting, pagination);
+
+            Response.AddPaginationResponse(pagedMunicipalities.PaginationInfo);
+            Response.AddSortingResponse(sorting.SortBy, sorting.SortOrder);
 
             return Ok(
-                new DomainListResponse());
+                new DomainListResponse
+                {
+                    Domains = await pagedMunicipalities
+                        .Items
+                        .Select(x => new DomainListItemResponse(x))
+                        .ToListAsync(cancellationToken)
+                });
         }
 
         /// <summary>
@@ -117,15 +134,12 @@ namespace Dns.Api.Domain
             [FromRoute] string topLevelDomain,
             CancellationToken cancellationToken = default)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var domain = await context
                 .DomainDetails
                 .FindAsync(new object[] { $"{secondLevelDomain}.{topLevelDomain}" }, cancellationToken);
 
             if (domain == null)
-                throw new ApiException("Non-existant domain.", StatusCodes.Status404NotFound);
+                throw new ApiException(DomainNotFoundResponseExamples.Message, StatusCodes.Status404NotFound);
 
             return Ok(
                 new DomainResponse(domain));
@@ -155,9 +169,6 @@ namespace Dns.Api.Domain
             [FromRoute] string topLevelDomain,
             CancellationToken cancellationToken = default)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             // TODO: Implement getting from context
 
             return Ok(
@@ -190,9 +201,6 @@ namespace Dns.Api.Domain
             [FromRoute] ServiceId serviceId,
             CancellationToken cancellationToken = default)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             // TODO: Implement getting from context
 
             return Ok(
