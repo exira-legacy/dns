@@ -34,11 +34,11 @@ namespace Dns.Tests
             Assert(new Scenario()
                 .Given(domainName,
                     new DomainWasCreated(domainName),
-                    new GoogleSuiteWasAdded(serviceId, verificationToken))
+                    new GoogleSuiteWasAdded(domainName, serviceId, verificationToken))
                 .When(new RemoveService(domainName, serviceId))
                 .Then(domainName,
-                    new ServiceWasRemoved(serviceId),
-                    new RecordSetUpdated(new RecordSet())));
+                    new ServiceWasRemoved(domainName, serviceId),
+                    new RecordSetUpdated(domainName, new RecordSet())));
         }
 
         [Fact]
@@ -54,12 +54,12 @@ namespace Dns.Tests
             Assert(new Scenario()
                 .Given(domainName,
                     new DomainWasCreated(domainName),
-                    new GoogleSuiteWasAdded(serviceId1, verificationToken),
-                    new GoogleSuiteWasAdded(serviceId2, verificationToken))
+                    new GoogleSuiteWasAdded(domainName, serviceId1, verificationToken),
+                    new GoogleSuiteWasAdded(domainName, serviceId2, verificationToken))
                 .When(new RemoveService(domainName, serviceId2))
                 .Then(domainName,
-                    new ServiceWasRemoved(serviceId2),
-                    new RecordSetUpdated(googleService.GetRecords())));
+                    new ServiceWasRemoved(domainName, serviceId2),
+                    new RecordSetUpdated(domainName, googleService.GetRecords())));
         }
 
         [Fact]
@@ -73,7 +73,7 @@ namespace Dns.Tests
             Assert(new Scenario()
                 .Given(domainName,
                     new DomainWasCreated(domainName),
-                    new GoogleSuiteWasAdded(serviceId1, verificationToken))
+                    new GoogleSuiteWasAdded(domainName, serviceId1, verificationToken))
                 .When(new RemoveService(domainName, serviceId2))
                 .ThenNone());
         }

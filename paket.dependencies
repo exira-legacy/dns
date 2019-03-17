@@ -27,6 +27,8 @@ nuget MySqlConnector 0.49.3
 
 nuget FluentValidation.AspNetCore 8.1.3
 
+nuget Microsoft.EntityFrameworkCore.Design 2.2.3
+
 // BASE REGISTRIES STUFF
 nuget Be.Vlaanderen.Basisregisters.Build.Pipeline ~> 1.5
 nuget Be.Vlaanderen.Basisregisters.Testing.Infrastructure.Events ~> 1.0 content: true, copy_content_to_output_dir: always, copy_local: true
@@ -45,6 +47,18 @@ nuget Be.Vlaanderen.Basisregisters.CommandHandling.SqlStreamStore ~> 3.0
 
 nuget Be.Vlaanderen.Basisregisters.EventHandling ~> 1.0
 nuget Be.Vlaanderen.Basisregisters.EventHandling.Autofac ~> 1.0
+
+nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore ~> 3.1
+nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac ~> 3.1
+nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner ~> 3.1
+nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector ~> 3.1
+nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector.Testing ~> 3.1
+
+nuget Be.Vlaanderen.Basisregisters.Projector ~> 1.1
+
+nuget Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac ~> 1.1
+nuget Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql ~> 1.1
+nuget Be.Vlaanderen.Basisregisters.DataDog.Tracing.SqlStreamStore ~> 1.1
 
 // DOCS STUFF
 nuget Structurizr.Core 0.9.0

@@ -26,6 +26,9 @@ namespace Dns.Api.Infrastructure.Modules
             var eventSerializerSettings = EventsJsonSerializerSettingsProvider.CreateSerializerSettings();
 
             containerBuilder
+                .RegisterModule(new LoggingModule(_configuration, _services));
+
+            containerBuilder
                 .RegisterModule(new EventHandlingModule(typeof(DomainAssemblyMarker).Assembly, eventSerializerSettings));
 
             containerBuilder

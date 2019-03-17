@@ -8,17 +8,33 @@ namespace Dns.Domain.Events
     [EventDescription("The service was removed.")]
     public class ServiceWasRemoved
     {
+        [JsonIgnore]
+        public string DomainName { get; }
+        public string SecondLevelDomain { get; }
+        public string TopLevelDomain { get; }
+
         public Guid ServiceId { get; }
 
-        public ServiceWasRemoved(ServiceId serviceId)
+        public ServiceWasRemoved(
+            DomainName domainName,
+            ServiceId serviceId)
         {
+            DomainName = domainName;
+            SecondLevelDomain = domainName.SecondLevelDomain;
+            TopLevelDomain = domainName.TopLevelDomain.Value;
+
             ServiceId = serviceId;
         }
 
         [JsonConstructor]
         private ServiceWasRemoved(
+            string secondLevelDomain,
+            string topLevelDomain,
             Guid serviceId)
             : this(
+                new DomainName(
+                    new SecondLevelDomain(secondLevelDomain),
+                    Dns.TopLevelDomain.FromValue(topLevelDomain)),
                 new ServiceId(serviceId)) {}
     }
 }

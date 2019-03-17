@@ -1,8 +1,8 @@
-namespace Dns.Api.Infrastructure
+namespace Dns.Api.Projector.Infrastructure
 {
     using System.Security.Cryptography.X509Certificates;
-    using Microsoft.AspNetCore.Hosting;
     using Be.Vlaanderen.Basisregisters.Api;
+    using Microsoft.AspNetCore.Hosting;
 
     public class Program
     {
@@ -17,8 +17,8 @@ namespace Dns.Api.Infrastructure
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
             => new WebHostBuilder()
                 .UseDefaultForApi<Startup>(
-                    httpPort: 1090,
-                    httpsPort: 1444,
+                    httpPort: 2090,
+                    httpsPort: 2444,
                     httpsCertificate: () => new X509Certificate2(DevelopmentCertificate.Name, DevelopmentCertificate.Key),
                     commandLineArgs: args);
     }

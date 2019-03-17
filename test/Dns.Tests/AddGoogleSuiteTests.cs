@@ -38,8 +38,8 @@ namespace Dns.Tests
                 .Given(domainName, new DomainWasCreated(domainName))
                 .When(new AddGoogleSuite(domainName, serviceId, verificationToken))
                 .Then(domainName,
-                    new GoogleSuiteWasAdded(serviceId, verificationToken),
-                    new RecordSetUpdated(googleService.GetRecords())));
+                    new GoogleSuiteWasAdded(domainName, serviceId, verificationToken),
+                    new RecordSetUpdated(domainName, googleService.GetRecords())));
         }
 
         [Fact]
@@ -52,7 +52,7 @@ namespace Dns.Tests
             Assert(new Scenario()
                 .Given(domainName,
                     new DomainWasCreated(domainName),
-                    new GoogleSuiteWasAdded(serviceId, verificationToken))
+                    new GoogleSuiteWasAdded(domainName, serviceId, verificationToken))
                 .When(new AddGoogleSuite(domainName, serviceId, verificationToken))
                 .Throws(new ServiceAlreadyExistsException(serviceId)));
         }

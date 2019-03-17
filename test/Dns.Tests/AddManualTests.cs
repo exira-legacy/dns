@@ -45,8 +45,8 @@ namespace Dns.Tests
                 .Given(domainName, new DomainWasCreated(domainName))
                 .When(new AddManual(domainName, serviceId, label, recordset))
                 .Then(domainName,
-                    new ManualWasAdded(serviceId, label, recordset),
-                    new RecordSetUpdated(manualService.GetRecords())));
+                    new ManualWasAdded(domainName, serviceId, label, recordset),
+                    new RecordSetUpdated(domainName, manualService.GetRecords())));
         }
 
         [Fact]
@@ -60,7 +60,7 @@ namespace Dns.Tests
             Assert(new Scenario()
                 .Given(domainName,
                     new DomainWasCreated(domainName),
-                    new ManualWasAdded(serviceId, label, recordset))
+                    new ManualWasAdded(domainName, serviceId, label, recordset))
                 .When(new AddManual(domainName, serviceId, label, recordset))
                 .Throws(new ServiceAlreadyExistsException(serviceId)));
         }

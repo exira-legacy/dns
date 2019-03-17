@@ -1,17 +1,14 @@
-namespace Dns.Api.Infrastructure
+namespace Dns.Api.Projector.Infrastructure
 {
     using System;
     using System.Linq;
     using System.Reflection;
     using Be.Vlaanderen.Basisregisters.Api;
-    using Autofac;
-    using Autofac.Extensions.DependencyInjection;
-    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.AspNetCore;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
+    using Autofac;
+    using Autofac.Extensions.DependencyInjection;
     using Configuration;
-    using Exceptions;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -21,6 +18,7 @@ namespace Dns.Api.Infrastructure
     using Modules;
     using SqlStreamStore;
     using Swashbuckle.AspNetCore.Swagger;
+    using TraceSource = Be.Vlaanderen.Basisregisters.DataDog.Tracing.TraceSource;
 
     /// <summary>Represents the startup process for the application.</summary>
     public class Startup
@@ -28,8 +26,15 @@ namespace Dns.Api.Infrastructure
         private IContainer _applicationContainer;
 
         private readonly IConfiguration _configuration;
+        private readonly ILoggerFactory _loggerFactory;
 
-        public Startup(IConfiguration configuration) => _configuration = configuration;
+        public Startup(
+            IConfiguration configuration,
+            ILoggerFactory loggerFactory)
+        {
+            _configuration = configuration;
+            _loggerFactory = loggerFactory;
+        }
 
         /// <summary>Configures services for the application.</summary>
         /// <param name="services">The collection of services to configure the application with.</param>
@@ -40,7 +45,7 @@ namespace Dns.Api.Infrastructure
                     (provider, description) => new Info
                     {
                         Version = description.ApiVersion.ToString(),
-                        Title = "Dns API",
+                        Title = "Dns Projector API",
                         Description = GetApiLeadingText(description),
                         Contact = new Contact
                         {
@@ -49,15 +54,14 @@ namespace Dns.Api.Infrastructure
                             Url = "https://exira.com"
                         }
                     },
-                    new []
+                    new[]
                     {
                         typeof(Startup).GetTypeInfo().Assembly.GetName().Name,
                     },
-                    _configuration.GetSection("Cors").GetChildren().Select(c => c.Value).ToArray(),
-                    fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
+                    _configuration.GetSection("Cors").GetChildren().Select(c => c.Value).ToArray());
 
             var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterModule(new ApiModule(_configuration, services));
+            containerBuilder.RegisterModule(new ApiModule(_configuration, services, _loggerFactory));
             _applicationContainer = containerBuilder.Build();
 
             return new AutofacServiceProvider(_applicationContainer);
@@ -98,14 +102,6 @@ namespace Dns.Api.Infrastructure
                 {
                     VersionProvider = apiVersionProvider,
                     Info = groupName => $"exira.com - Dns API {groupName}",
-                    CustomExceptionHandlers = new IExceptionHandler[]
-                    {
-                        new DomainExceptionHandler(),
-                        new Exceptions.ApiExceptionHandler(),
-                        new AggregateNotFoundExceptionHandling(),
-                        new WrongExpectedVersionExceptionHandling(),
-                        new InvalidTopLevelDomainExceptionHandling(),
-                    }
                 },
                 Server =
                 {
@@ -115,11 +111,11 @@ namespace Dns.Api.Infrastructure
                 MiddlewareHooks =
                 {
                     AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>(),
-                },
+                }
             });
         }
 
         private static string GetApiLeadingText(ApiVersionDescription description)
-            => $"Right now you are reading the documentation for version {description.ApiVersion} of the exira.com Dns API{string.Format(description.IsDeprecated ? ", **this API version is not supported any more**." : ".")}";
+            => $"Right now you are reading the documentation for version {description.ApiVersion} of the exira.com Dns Projector API{string.Format(description.IsDeprecated ? ", **this API version is not supported any more**." : ".")}";
     }
 }

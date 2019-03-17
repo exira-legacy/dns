@@ -7,12 +7,15 @@ namespace Dns.Domain.Events
     [EventDescription("The domain was created.")]
     public class DomainWasCreated
     {
+        [JsonIgnore]
+        public string DomainName { get; }
         public string SecondLevelDomain { get; }
         public string TopLevelDomain { get; }
 
         public DomainWasCreated(
             DomainName domainName)
         {
+            DomainName = domainName;
             SecondLevelDomain = domainName.SecondLevelDomain;
             TopLevelDomain = domainName.TopLevelDomain.Value;
         }

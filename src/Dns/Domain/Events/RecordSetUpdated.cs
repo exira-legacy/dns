@@ -9,11 +9,21 @@ namespace Dns.Domain.Events
     [EventDescription("The complete record set was updated.")]
     public class RecordSetUpdated
     {
+        [JsonIgnore]
+        public string DomainName { get; }
+        public string SecondLevelDomain { get; }
+        public string TopLevelDomain { get; }
+
         public RecordData[] Records { get; }
 
         public RecordSetUpdated(
+            DomainName domainName,
             RecordSet recordSet)
         {
+            DomainName = domainName;
+            SecondLevelDomain = domainName.SecondLevelDomain;
+            TopLevelDomain = domainName.TopLevelDomain.Value;
+
             Records = recordSet
                 .Select(r => new RecordData(r))
                 .ToArray();
@@ -21,8 +31,13 @@ namespace Dns.Domain.Events
 
         [JsonConstructor]
         private RecordSetUpdated(
+            string secondLevelDomain,
+            string topLevelDomain,
             IReadOnlyCollection<RecordData> records)
             : this(
+                new DomainName(
+                    new SecondLevelDomain(secondLevelDomain),
+                    Dns.TopLevelDomain.FromValue(topLevelDomain)),
                 new RecordSet(records.Select(r => r.ToRecord()).ToList())) { }
     }
 }

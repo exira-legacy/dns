@@ -8,22 +8,37 @@ namespace Dns.Domain.Services.GoogleSuite.Events
     [EventDescription("The G Suite service was added.")]
     public class GoogleSuiteWasAdded
     {
+        [JsonIgnore]
+        public string DomainName { get; }
+        public string SecondLevelDomain { get; }
+        public string TopLevelDomain { get; }
+
         public Guid ServiceId { get; }
         public string VerificationToken { get; }
 
         public GoogleSuiteWasAdded(
+            DomainName domainName,
             ServiceId serviceId,
             GoogleVerificationToken verificationToken)
         {
+            DomainName = domainName;
+            SecondLevelDomain = domainName.SecondLevelDomain;
+            TopLevelDomain = domainName.TopLevelDomain.Value;
+
             ServiceId = serviceId;
             VerificationToken = verificationToken;
         }
 
         [JsonConstructor]
         private GoogleSuiteWasAdded(
+            string secondLevelDomain,
+            string topLevelDomain,
             Guid serviceId,
             string verificationToken)
             : this(
+                new DomainName(
+                    new SecondLevelDomain(secondLevelDomain),
+                    Dns.TopLevelDomain.FromValue(topLevelDomain)),
                 new ServiceId(serviceId),
                 new GoogleVerificationToken(verificationToken)) { }
     }

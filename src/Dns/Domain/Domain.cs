@@ -24,14 +24,14 @@ namespace Dns.Domain
         public void AddManual(ServiceId serviceId, ManualLabel label, RecordSet records)
         {
             CheckIfServiceAlreadyExists(serviceId);
-            ApplyChange(new ManualWasAdded(serviceId, label, records));
+            ApplyChange(new ManualWasAdded(_name, serviceId, label, records));
             UpdateRecordSet();
         }
 
         public void AddGoogleSuite(ServiceId serviceId, GoogleVerificationToken verificationToken)
         {
             CheckIfServiceAlreadyExists(serviceId);
-            ApplyChange(new GoogleSuiteWasAdded(serviceId, verificationToken));
+            ApplyChange(new GoogleSuiteWasAdded(_name, serviceId, verificationToken));
             UpdateRecordSet();
         }
 
@@ -40,7 +40,7 @@ namespace Dns.Domain
             if (!_services.ContainsKey(serviceId))
                 return;
 
-            ApplyChange(new ServiceWasRemoved(serviceId));
+            ApplyChange(new ServiceWasRemoved(_name, serviceId));
             UpdateRecordSet();
         }
 
@@ -54,6 +54,7 @@ namespace Dns.Domain
         {
             ApplyChange(
                 new RecordSetUpdated(
+                    _name,
                     _services.Values.Aggregate(
                         new RecordSet(),
                         (r, service) => r.AddRecords(service.GetRecords()),
