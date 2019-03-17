@@ -10,6 +10,7 @@ namespace Dns.Api.Domain
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Newtonsoft.Json.Converters;
+    using Projections.Api;
     using Requests;
     using Responses;
     using Swashbuckle.AspNetCore.Filters;
@@ -66,6 +67,71 @@ namespace Dns.Api.Domain
         }
 
         /// <summary>
+        /// List domains.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="cancellationToken"></param>
+        /// <response code="200">If the domain is found.</response>
+        /// <response code="404">If the domain does not exist.</response>
+        /// <response code="500">If an internal error has occurred.</response>
+        /// <returns></returns>
+        [HttpGet]
+        [ProducesResponseType(typeof(DomainListResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(DomainListResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        public async Task<IActionResult> ListDomains(
+            [FromServices] ApiProjectionsContext context,
+            CancellationToken cancellationToken = default)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            // TODO: Implement getting from context
+
+            return Ok(
+                new DomainListResponse());
+        }
+
+        /// <summary>
+        /// List details of a domain.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="secondLevelDomain">Second level domain of the domain to list details for.</param>
+        /// <param name="topLevelDomain">Top level domain of the domain to list details for.</param>
+        /// <param name="cancellationToken"></param>
+        /// <response code="200">If the domain is found.</response>
+        /// <response code="404">If the domain does not exist.</response>
+        /// <response code="500">If an internal error has occurred.</response>
+        /// <returns></returns>
+        [HttpGet("{secondLevelDomain}.{topLevelDomain}")]
+        [ProducesResponseType(typeof(DomainResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(DomainResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(DomainNotFoundResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        public async Task<IActionResult> DetailDomain(
+            [FromServices] ApiProjectionsContext context,
+            [FromRoute] string secondLevelDomain,
+            [FromRoute] string topLevelDomain,
+            CancellationToken cancellationToken = default)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var domain = await context
+                .DomainDetails
+                .FindAsync(new object[] { $"{secondLevelDomain}.{topLevelDomain}" }, cancellationToken);
+
+            if (domain == null)
+                throw new ApiException("Non-existant domain.", StatusCodes.Status404NotFound);
+
+            return Ok(
+                new DomainResponse(domain));
+        }
+
+        /// <summary>
         /// List services of a domain.
         /// </summary>
         /// <param name="context"></param>
@@ -76,7 +142,7 @@ namespace Dns.Api.Domain
         /// <response code="404">If the domain does not exist.</response>
         /// <response code="500">If an internal error has occurred.</response>
         /// <returns></returns>
-        [HttpPost("{secondLevelDomain}.{topLevelDomain}/services")]
+        [HttpGet("{secondLevelDomain}.{topLevelDomain}/services")]
         [ProducesResponseType(typeof(DomainServiceListResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
@@ -84,7 +150,7 @@ namespace Dns.Api.Domain
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(DomainNotFoundResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         public async Task<IActionResult> ListServices(
-            //[FromServices] DnsContext context,
+            [FromServices] ApiProjectionsContext context,
             [FromRoute] string secondLevelDomain,
             [FromRoute] string topLevelDomain,
             CancellationToken cancellationToken = default)
@@ -110,7 +176,7 @@ namespace Dns.Api.Domain
         /// <response code="404">If the domain or domain service does not exist.</response>
         /// <response code="500">If an internal error has occurred.</response>
         /// <returns></returns>
-        [HttpPost("{secondLevelDomain}.{topLevelDomain}/services/{serviceId}")]
+        [HttpGet("{secondLevelDomain}.{topLevelDomain}/services/{serviceId}")]
         [ProducesResponseType(typeof(DomainServiceResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
@@ -118,7 +184,7 @@ namespace Dns.Api.Domain
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(DomainNotFoundResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         public async Task<IActionResult> GetService(
-            //[FromServices] DnsContext context,
+            [FromServices] ApiProjectionsContext context,
             [FromRoute] string secondLevelDomain,
             [FromRoute] string topLevelDomain,
             [FromRoute] ServiceId serviceId,

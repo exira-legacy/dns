@@ -49,11 +49,10 @@ namespace Dns.Api.Projector.Infrastructure.Modules
                     typeof(DomainAssemblyMarker).Assembly,
                     EventsJsonSerializerSettingsProvider.CreateSerializerSettings()));
 
-            builder.RegisterModule<EnvelopeModule>();
-
-            builder.RegisterEventstreamModule(_configuration);
-
-            builder.RegisterModule<ProjectorModule>();
+            builder
+                .RegisterModule<EnvelopeModule>()
+                .RegisterEventstreamModule(_configuration)
+                .RegisterModule<ProjectorModule>();
 
             RegisterApiProjections(builder);
         }
