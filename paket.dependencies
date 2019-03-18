@@ -23,7 +23,7 @@ nuget Autofac.Extensions.DependencyInjection 4.4.0
 
 nuget Dapper 1.60.1
 nuget Dapper.Contrib 1.60.1
-nuget MySqlConnector 0.49.3
+nuget MySqlConnector 0.50.0
 
 nuget FluentValidation.AspNetCore 8.1.3
 
@@ -40,7 +40,7 @@ nuget Be.Vlaanderen.Basisregisters.AggregateSource.Testing ~> 3.0
 nuget Be.Vlaanderen.Basisregisters.AggregateSource.Testing.SqlStreamStore.Autofac ~> 3.0
 nuget Be.Vlaanderen.Basisregisters.AggregateSource.Testing.Xunit ~> 3.0
 
-nuget Be.Vlaanderen.Basisregisters.Api ~> 1.9
+nuget Be.Vlaanderen.Basisregisters.Api ~> 1.10
 
 nuget Be.Vlaanderen.Basisregisters.CommandHandling ~> 3.0
 nuget Be.Vlaanderen.Basisregisters.CommandHandling.SqlStreamStore ~> 3.0

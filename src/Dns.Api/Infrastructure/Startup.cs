@@ -56,12 +56,9 @@ namespace Dns.Api.Infrastructure
                             Url = "https://exira.com"
                         }
                     },
-                    new []
-                    {
-                        typeof(Startup).GetTypeInfo().Assembly.GetName().Name,
-                    },
-                    _configuration.GetSection("Cors").GetChildren().Select(c => c.Value).ToArray(),
-                    fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
+                    new [] { typeof(Startup).GetTypeInfo().Assembly.GetName().Name, },
+                    corsHeaders: _configuration.GetSection("Cors").GetChildren().Select(c => c.Value).ToArray(),
+                    configureFluentValidation: fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
 
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterModule(new ApiModule(_configuration, services, _loggerFactory));
