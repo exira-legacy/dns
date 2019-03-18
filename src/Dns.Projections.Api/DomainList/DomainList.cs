@@ -98,8 +98,6 @@ namespace Dns.Projections.Api.DomainList
             b.Property(DomainList.ServicesBackingPropertyName)
                 .HasColumnName("Services");
 
-            b.Property(x => x.Services);
-
             b.Ignore(x => x.CreatedAtTimestamp);
             b.Ignore(x => x.Services);
         }
