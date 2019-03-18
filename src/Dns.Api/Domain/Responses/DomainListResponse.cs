@@ -30,7 +30,7 @@ namespace Dns.Api.Domain.Responses
         /// Services of the domain.
         /// </summary>
         [DataMember(Name = "Services", Order = 2)]
-        public DomainListItemServiceResponse[] Services { get; set; }
+        public List<DomainListItemServiceResponse> Services { get; set; }
 
         public DomainListItemResponse(
             DomainList domainList)
@@ -40,7 +40,7 @@ namespace Dns.Api.Domain.Responses
             Services = domainList
                 .Services
                 .Select(x => new DomainListItemServiceResponse(x.ServiceId, x.Type, x.Label))
-                .ToArray();
+                .ToList();
         }
     }
 
@@ -87,19 +87,19 @@ namespace Dns.Api.Domain.Responses
                         new DomainList
                         {
                             Name = "exira.com",
-                            Services = new DomainList.DomainListService[]
+                            Services = new[]
                             {
-                                new DomainList.DomainListService(Guid.NewGuid(), "googlesuite", "Google Suite"),
-                                new DomainList.DomainListService(Guid.NewGuid(), "manual", "My Mail Server"), // TODO: get rid of magic types
-                                new DomainList.DomainListService(Guid.NewGuid(), "manual", "Datacenter Records"),
+                                new DomainList.DomainListService(Guid.NewGuid(), ServiceType.googlesuite.Value, ServiceType.googlesuite.DisplayName),
+                                new DomainList.DomainListService(Guid.NewGuid(), ServiceType.manual.Value, "My Mail Server"),
+                                new DomainList.DomainListService(Guid.NewGuid(), ServiceType.manual.Value, "Datacenter Records"),
                             }
                         }),
                     new DomainListItemResponse(new DomainList
                     {
                         Name = "cumps.be",
-                        Services = new DomainList.DomainListService[]
+                        Services = new[]
                         {
-                            new DomainList.DomainListService(Guid.NewGuid(), "googlesuite", "Google Suite"),
+                            new DomainList.DomainListService(Guid.NewGuid(), ServiceType.googlesuite.Value, ServiceType.googlesuite.DisplayName),
                         }
                     }),
                 }

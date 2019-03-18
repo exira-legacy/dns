@@ -12,7 +12,7 @@ namespace Dns.Domain.Services.GoogleSuite
 
         public GoogleVerificationToken([JsonProperty("value")] string token) : base(token)
         {
-            if (string.IsNullOrWhiteSpace(token))
+            if (string.IsNullOrWhiteSpace(Value))
                 throw new EmptyGoogleVerificationTokenException();
         }
     }

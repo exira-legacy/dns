@@ -1,5 +1,8 @@
 namespace Dns.Projections.Api.DomainList
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Domain.Events;
@@ -36,28 +39,20 @@ namespace Dns.Projections.Api.DomainList
             });
 
             When<Envelope<GoogleSuiteWasAdded>>(async (context, message, ct) =>
-            {
-                await context.FindAndUpdateDomainList(
+                await AddService(context,
                     message.Message.DomainName,
-                    domain => domain.AddService(
-                        new DomainList.DomainListService(
-                            message.Message.ServiceId,
-                            "googlesuite", // TODO: 'googlesuite' should come from the service
-                            "Google Suite")),
-                    ct);
-            });
+                    message.Message.ServiceId,
+                    message.Message.ServiceType,
+                    message.Message.ServiceLabel,
+                    ct));
 
             When<Envelope<ManualWasAdded>>(async (context, message, ct) =>
-            {
-                await context.FindAndUpdateDomainList(
+                await AddService(context,
                     message.Message.DomainName,
-                    domain => domain.AddService(
-                        new DomainList.DomainListService(
-                            message.Message.ServiceId,
-                            "manual", // TODO: 'manual' should come from the service
-                            message.Message.Label)), 
-                    ct);
-            });
+                    message.Message.ServiceId,
+                    message.Message.ServiceType,
+                    message.Message.ServiceLabel,
+                    ct));
 
             When<Envelope<ServiceWasRemoved>>(async (context, message, ct) =>
             {
@@ -67,5 +62,17 @@ namespace Dns.Projections.Api.DomainList
                     ct);
             });
         }
+
+        private static async Task AddService(
+            ApiProjectionsContext context,
+            string domainName,
+            Guid serviceId,
+            string serviceType,
+            string serviceLabel,
+            CancellationToken ct) =>
+            await context.FindAndUpdateDomainList(
+                domainName,
+                domain => domain.AddService(new DomainList.DomainListService(serviceId, serviceType, serviceLabel)),
+                ct);
     }
 }

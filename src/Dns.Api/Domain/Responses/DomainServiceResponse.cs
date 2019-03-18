@@ -38,8 +38,7 @@ namespace Dns.Api.Domain.Responses
 
     public class DomainServiceResponseExamples : IExamplesProvider
     {
-        // TODO: See if we can turn this type into a value object and have some constants on the services
         public object GetExamples()
-            => new DomainServiceResponse(new ServiceId(Guid.NewGuid()), "manual", "My Mail Services");
+            => new DomainServiceResponse(new ServiceId(Guid.NewGuid()), ServiceType.manual.Value, "My Mail Services");
     }
 }

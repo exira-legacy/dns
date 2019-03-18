@@ -34,7 +34,7 @@ namespace Dns.Domain
                 new ServiceId(@event.ServiceId),
                 new ManualService(
                     new ServiceId(@event.ServiceId),
-                    new ManualLabel(@event.Label),
+                    new ManualLabel(@event.ServiceLabel),
                     new RecordSet(
                         @event.Records.Select(r => new Record(
                             RecordType.FromValue(r.Type),

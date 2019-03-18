@@ -54,9 +54,8 @@ namespace Dns.Api.Domain.Responses
             {
                 Services = new List<DomainServiceListItemResponse>
                 {
-                    // TODO: See if we can turn this type into a value object and have some constants on the services
-                    new DomainServiceListItemResponse(new ServiceId(Guid.NewGuid()), "manual", "My Mail Services"),
-                    new DomainServiceListItemResponse(new ServiceId(Guid.NewGuid()), "googlesuite", "Google Suite")
+                    new DomainServiceListItemResponse(new ServiceId(Guid.NewGuid()), ServiceType.manual.Value, "My Mail Services"),
+                    new DomainServiceListItemResponse(new ServiceId(Guid.NewGuid()), ServiceType.googlesuite.Value, ServiceType.googlesuite.DisplayName)
                 }
             };
     }

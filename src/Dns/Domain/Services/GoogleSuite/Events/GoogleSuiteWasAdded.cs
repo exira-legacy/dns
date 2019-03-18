@@ -14,6 +14,9 @@ namespace Dns.Domain.Services.GoogleSuite.Events
         public string TopLevelDomain { get; }
 
         public Guid ServiceId { get; }
+        public string ServiceType { get; }
+        public string ServiceLabel { get; }
+
         public string VerificationToken { get; }
 
         public GoogleSuiteWasAdded(
@@ -27,6 +30,10 @@ namespace Dns.Domain.Services.GoogleSuite.Events
 
             ServiceId = serviceId;
             VerificationToken = verificationToken;
+
+            var service = new GoogleSuiteService(serviceId, verificationToken);
+            ServiceType = service.Type.Value;
+            ServiceLabel = service.Label;
         }
 
         [JsonConstructor]

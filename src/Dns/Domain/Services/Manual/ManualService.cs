@@ -5,7 +5,12 @@ namespace Dns.Domain.Services.Manual
         private readonly ManualLabel _label;
         private readonly RecordSet _records;
 
+        internal static string ServiceType = "manual";
+        internal static string ServiceName = "Manual";
+
         public ServiceId ServiceId { get; }
+        public ServiceType Type => Dns.ServiceType.manual;
+        public ServiceLabel Label => new ServiceLabel(_label);
 
         public ManualService(
             ServiceId serviceId,

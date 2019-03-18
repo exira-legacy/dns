@@ -32,7 +32,7 @@ namespace Dns.Api.Infrastructure.Modules
                 .Enrich.WithEnvironmentUserName()
                 .Destructure.JsonNetTypes()
                 .CreateLogger();
-            
+
             services.AddLogging(l =>
             {
                 l.ClearProviders();

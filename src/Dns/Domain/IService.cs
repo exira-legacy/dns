@@ -4,10 +4,9 @@ namespace Dns.Domain
     {
         ServiceId ServiceId { get; }
 
-        // TODO: Add to make life easier
-        //ServiceType Type { get; set; }
+        ServiceType Type { get; }
 
-        //ServiceLabel Label { get; set; }
+        ServiceLabel Label { get; }
 
         RecordSet GetRecords();
     }

@@ -18,8 +18,8 @@ namespace Dns.Domain.Services.Manual.Events
         public string TopLevelDomain { get; }
 
         public Guid ServiceId { get; }
-
-        public string Label { get; }
+        public string ServiceType { get; }
+        public string ServiceLabel { get; }
 
         public RecordData[] Records { get; }
 
@@ -34,11 +34,14 @@ namespace Dns.Domain.Services.Manual.Events
             TopLevelDomain = domainName.TopLevelDomain.Value;
 
             ServiceId = serviceId;
-            Label = label;
 
             Records = recordSet
                 .Select(r => new RecordData(r))
                 .ToArray();
+
+            var service = new ManualService(serviceId, label, recordSet);
+            ServiceType = service.Type.Value;
+            ServiceLabel = service.Label;
         }
 
         [JsonConstructor]
@@ -46,14 +49,14 @@ namespace Dns.Domain.Services.Manual.Events
             string secondLevelDomain,
             string topLevelDomain,
             Guid serviceId,
-            string label,
+            string serviceLabel,
             IReadOnlyCollection<RecordData> records)
             : this(
                 new DomainName(
                     new SecondLevelDomain(secondLevelDomain),
                     Dns.TopLevelDomain.FromValue(topLevelDomain)),
                 new ServiceId(serviceId),
-                new ManualLabel(label),
+                new ManualLabel(serviceLabel),
                 new RecordSet(records.Select(r => r.ToRecord()).ToList()))
         { }
     }

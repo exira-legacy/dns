@@ -9,7 +9,7 @@ namespace Dns
     {
         public ServiceId([JsonProperty("value")] Guid serviceId) : base(serviceId)
         {
-            if (serviceId == Guid.Empty)
+            if (Value == Guid.Empty)
                 throw new EmptyServiceIdException();
         }
     }

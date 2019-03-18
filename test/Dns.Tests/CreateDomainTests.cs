@@ -5,8 +5,10 @@ namespace Dns.Tests
     using Domain.Commands;
     using Domain.Events;
     using Infrastructure;
+    using SqlStreamStore.Streams;
     using Xunit;
     using Xunit.Abstractions;
+    using DomainName = DomainName;
 
     public class CreateDomainTests : DnsTest
     {
@@ -17,6 +19,7 @@ namespace Dns.Tests
             Fixture = new Fixture();
             Fixture.CustomizeSecondLevelDomain();
             Fixture.CustomizeTopLevelDomain();
+            Fixture.CustomizeDomainName();
         }
 
         [Fact]
@@ -31,6 +34,17 @@ namespace Dns.Tests
                     new DomainWasCreated(createDomainCommand.DomainName)));
         }
 
-        // TODO: Create test when creating an already existing domain
+        [Fact]
+        public void domain_should_not_be_duplicated()
+        {
+            var domainName = Fixture.Create<DomainName>();
+            var createDomainCommand = new CreateDomain(domainName);
+
+            Assert(new Scenario()
+                .Given(domainName,
+                    new DomainWasCreated(domainName))
+                .When(createDomainCommand)
+                .Throws(new WrongExpectedVersionException($"Append failed due to WrongExpectedVersion.Stream: {domainName}, Expected version: -1")));
+        }
     }
 }

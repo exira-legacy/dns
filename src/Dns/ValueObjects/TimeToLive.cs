@@ -11,7 +11,7 @@ namespace Dns
 
         public TimeToLive([JsonProperty("value")] int timeToLive) : base(timeToLive)
         {
-            if (timeToLive <= 0)
+            if (Value <= 0)
                 throw new NegativeTimeToLiveException();
         }
     }

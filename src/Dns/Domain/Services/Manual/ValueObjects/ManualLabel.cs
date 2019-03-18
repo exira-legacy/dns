@@ -10,7 +10,7 @@ namespace Dns.Domain.Services.Manual
 
         public ManualLabel([JsonProperty("value")] string label) : base(label)
         {
-            if (string.IsNullOrWhiteSpace(label))
+            if (string.IsNullOrWhiteSpace(Value))
                 throw new EmptyManualLabelException();
         }
     }

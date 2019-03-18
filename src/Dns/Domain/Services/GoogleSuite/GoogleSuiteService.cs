@@ -4,7 +4,12 @@ namespace Dns.Domain.Services.GoogleSuite
     {
         private readonly GoogleVerificationToken _verificationToken;
 
+        internal static string ServiceType = "googlesuite";
+        internal static string ServiceName = "Google Suite";
+
         public ServiceId ServiceId { get; }
+        public ServiceType Type => Dns.ServiceType.googlesuite;
+        public ServiceLabel Label => new ServiceLabel(ServiceName);
 
         public GoogleSuiteService(
             ServiceId serviceId,
