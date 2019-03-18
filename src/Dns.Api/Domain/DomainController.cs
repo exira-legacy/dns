@@ -6,6 +6,7 @@ namespace Dns.Api.Domain
     using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.Api.Search;
     using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
@@ -94,16 +95,15 @@ namespace Dns.Api.Domain
             var sorting = Request.ExtractSortingRequest();
             var pagination = Request.ExtractPaginationRequest();
 
-            var pagedMunicipalities = new DomainListQuery(context)
+            var pagedDomains = new DomainListQuery(context)
                 .Fetch(filtering, sorting, pagination);
 
-            Response.AddPaginationResponse(pagedMunicipalities.PaginationInfo);
-            Response.AddSortingResponse(sorting.SortBy, sorting.SortOrder);
+            Response.AddPagedQueryResultHeaders(pagedDomains);
 
             return Ok(
                 new DomainListResponse
                 {
-                    Domains = await pagedMunicipalities
+                    Domains = await pagedDomains
                         .Items
                         .Select(x => new DomainListItemResponse(x))
                         .ToListAsync(cancellationToken)
