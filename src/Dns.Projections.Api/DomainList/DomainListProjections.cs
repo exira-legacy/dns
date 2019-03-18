@@ -39,10 +39,11 @@ namespace Dns.Projections.Api.DomainList
             {
                 await context.FindAndUpdateDomainList(
                     message.Message.DomainName,
-                    domain =>
-                    {
-                        // TODO: Implement
-                    },
+                    domain => domain.AddService(
+                        new DomainList.DomainListService(
+                            message.Message.ServiceId,
+                            "googlesuite", // TODO: 'googlesuite' should come from the service
+                            "Google Suite")),
                     ct);
             });
 
@@ -50,10 +51,11 @@ namespace Dns.Projections.Api.DomainList
             {
                 await context.FindAndUpdateDomainList(
                     message.Message.DomainName,
-                    domain =>
-                    {
-                        // TODO: Implement
-                    },
+                    domain => domain.AddService(
+                        new DomainList.DomainListService(
+                            message.Message.ServiceId,
+                            "manual", // TODO: 'manual' should come from the service
+                            message.Message.Label)), 
                     ct);
             });
 
@@ -61,10 +63,7 @@ namespace Dns.Projections.Api.DomainList
             {
                 await context.FindAndUpdateDomainList(
                     message.Message.DomainName,
-                    domain =>
-                    {
-                        // TODO: Implement
-                    },
+                    domain => domain.RemoveService(message.Message.ServiceId),
                     ct);
             });
         }

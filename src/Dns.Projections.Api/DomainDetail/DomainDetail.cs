@@ -5,6 +5,7 @@ namespace Dns.Projections.Api.DomainDetail
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
     using NodaTime;
     using System;
+    using System.Linq;
 
     public class DomainDetail
     {
@@ -35,8 +36,12 @@ namespace Dns.Projections.Api.DomainDetail
                 .HasKey(x => x.Name)
                 .ForSqlServerIsClustered();
 
-            b.Property(x => x.SecondLevelDomain);
-            b.Property(x => x.TopLevelDomain);
+            b.Property(x => x.SecondLevelDomain)
+                .HasMaxLength(SecondLevelDomain.MaxLength);
+
+            b.Property(x => x.TopLevelDomain)
+                .HasMaxLength(TopLevelDomain.GetAll().Max(x => x.Value.Length) * 2);
+
             b.Property(DomainDetail.CreatedAtTimestampBackingPropertyName)
                 .HasColumnName("CreatedAt");
 

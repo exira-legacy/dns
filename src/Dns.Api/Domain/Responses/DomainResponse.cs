@@ -26,19 +26,19 @@ namespace Dns.Api.Domain.Responses
         public string TopLevelDomain { get; set; }
 
         public DomainResponse(
-            DomainDetail domainDetail) :
-            this(
-                new DomainName(
-                    new SecondLevelDomain(domainDetail.SecondLevelDomain),
-                    Dns.TopLevelDomain.FromValue(domainDetail.TopLevelDomain))) { }
-
-        public DomainResponse(
             DomainName domainName)
         {
             Name = domainName;
             SecondLevelDomain = domainName.SecondLevelDomain;
             TopLevelDomain = domainName.TopLevelDomain.Value;
         }
+
+        public DomainResponse(
+            DomainDetail domainDetail) :
+            this(
+                new DomainName(
+                    new SecondLevelDomain(domainDetail.SecondLevelDomain),
+                    Dns.TopLevelDomain.FromValue(domainDetail.TopLevelDomain))) { }
     }
 
     public class DomainResponseExamples : IExamplesProvider
