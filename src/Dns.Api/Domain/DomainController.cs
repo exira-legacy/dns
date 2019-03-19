@@ -122,7 +122,7 @@ namespace Dns.Api.Domain
         /// <response code="500">If an internal error has occurred.</response>
         /// <returns></returns>
         [HttpGet("{secondLevelDomain}.{topLevelDomain}")]
-        [ProducesResponseType(typeof(DomainResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(DomainDetailResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(DomainResponseExamples), jsonConverter: typeof(StringEnumConverter))]
@@ -144,7 +144,7 @@ namespace Dns.Api.Domain
                 throw new ApiException(DomainNotFoundResponseExamples.Message, StatusCodes.Status404NotFound);
 
             return Ok(
-                new DomainResponse(domain));
+                new DomainDetailResponse(domain));
         }
 
         /// <summary>
@@ -190,7 +190,7 @@ namespace Dns.Api.Domain
         /// <response code="500">If an internal error has occurred.</response>
         /// <returns></returns>
         [HttpGet("{secondLevelDomain}.{topLevelDomain}/services/{serviceId}")]
-        [ProducesResponseType(typeof(DomainServiceResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(DomainServiceDetailResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(DomainServiceResponseExamples), jsonConverter: typeof(StringEnumConverter))]
@@ -206,7 +206,7 @@ namespace Dns.Api.Domain
             // TODO: Implement getting from context
 
             return Ok(
-                new DomainServiceResponse(null, null, null));
+                new DomainServiceDetailResponse(null, null, null));
         }
     }
 }

@@ -27,17 +27,6 @@ namespace Dns.Projections.Api.DomainList
                         }, ct);
             });
 
-            When<Envelope<RecordSetUpdated>>(async (context, message, ct) =>
-            {
-                await context.FindAndUpdateDomainList(
-                    message.Message.DomainName,
-                    domain =>
-                    {
-                        // TODO: Implement
-                    },
-                    ct);
-            });
-
             When<Envelope<GoogleSuiteWasAdded>>(async (context, message, ct) =>
                 await AddService(context,
                     message.Message.DomainName,
@@ -55,12 +44,16 @@ namespace Dns.Projections.Api.DomainList
                     ct));
 
             When<Envelope<ServiceWasRemoved>>(async (context, message, ct) =>
-            {
                 await context.FindAndUpdateDomainList(
                     message.Message.DomainName,
                     domain => domain.RemoveService(message.Message.ServiceId),
-                    ct);
-            });
+                    ct));
+
+            When<Envelope<RecordSetUpdated>>(async (context, message, ct) =>
+                await context.FindAndUpdateDomainList(
+                    message.Message.DomainName,
+                    domain => { }, // We don't care about recordset in the domain list
+                    ct));
         }
 
         private static async Task AddService(

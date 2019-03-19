@@ -5,7 +5,7 @@ namespace Dns.Api.Domain.Responses
     using Swashbuckle.AspNetCore.Filters;
 
     [DataContract(Name = "DomainService", Namespace = "")]
-    public class DomainServiceResponse
+    public class DomainServiceDetailResponse
     {
         /// <summary>
         /// Id of the domain service.
@@ -25,7 +25,7 @@ namespace Dns.Api.Domain.Responses
         [DataMember(Name = "Name", Order = 3)]
         public string Name { get; set; }
 
-        public DomainServiceResponse(
+        public DomainServiceDetailResponse(
             ServiceId id,
             string type,
             string name)
@@ -39,6 +39,6 @@ namespace Dns.Api.Domain.Responses
     public class DomainServiceResponseExamples : IExamplesProvider
     {
         public object GetExamples()
-            => new DomainServiceResponse(new ServiceId(Guid.NewGuid()), ServiceType.manual.Value, "My Mail Services");
+            => new DomainServiceDetailResponse(new ServiceId(Guid.NewGuid()), ServiceType.manual.Value, "My Mail Services");
     }
 }

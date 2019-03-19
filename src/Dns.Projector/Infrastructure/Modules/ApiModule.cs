@@ -45,14 +45,16 @@ namespace Dns.Projector.Infrastructure.Modules
 
         private void RegisterProjectionSetup(ContainerBuilder builder)
         {
-            builder.RegisterModule(
-                new EventHandlingModule(
-                    typeof(DomainAssemblyMarker).Assembly,
-                    EventsJsonSerializerSettingsProvider.CreateSerializerSettings()));
-
             builder
+                .RegisterModule(
+                    new EventHandlingModule(
+                        typeof(DomainAssemblyMarker).Assembly,
+                        EventsJsonSerializerSettingsProvider.CreateSerializerSettings()))
+
                 .RegisterModule<EnvelopeModule>()
+
                 .RegisterEventstreamModule(_configuration)
+
                 .RegisterModule<ProjectorModule>();
 
             RegisterApiProjections(builder);
@@ -63,13 +65,13 @@ namespace Dns.Projector.Infrastructure.Modules
             builder
                 .RegisterProjectionMigrator<ApiProjectionsContextMigrationFactory>(
                     _configuration,
-                    _loggerFactory);
+                    _loggerFactory)
 
-            builder.RegisterModule(
-                new ApiProjectionsModule(
-                    _configuration,
-                    _services,
-                    _loggerFactory));
+                .RegisterModule(
+                    new ApiProjectionsModule(
+                        _configuration,
+                        _services,
+                        _loggerFactory));
 
             builder
                 .RegisterProjections<DomainDetailProjections, ApiProjectionsContext>()

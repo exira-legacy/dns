@@ -12,8 +12,13 @@ namespace Dns.Projections.Api.DomainDetail
     public class DomainDetail
     {
         public static string CreatedAtTimestampBackingPropertyName = nameof(CreatedAtTimestampAsDateTimeOffset);
+        private DateTimeOffset CreatedAtTimestampAsDateTimeOffset { get; set; }
+
         public static string ServicesBackingPropertyName = nameof(ServicesAsString);
+        private string ServicesAsString { get; set; }
+
         public static string RecordSetBackingPropertyName = nameof(RecordSetAsString);
+        private string RecordSetAsString { get; set; }
 
         public string Name { get; set; }
 
@@ -21,20 +26,22 @@ namespace Dns.Projections.Api.DomainDetail
 
         public string TopLevelDomain { get; set; }
 
-        private DateTimeOffset CreatedAtTimestampAsDateTimeOffset { get; set; }
-
         public Instant CreatedAtTimestamp
         {
             get => Instant.FromDateTimeOffset(CreatedAtTimestampAsDateTimeOffset);
             set => CreatedAtTimestampAsDateTimeOffset = value.ToDateTimeOffset();
         }
 
-        private string ServicesAsString { get; set; }
-
         public IReadOnlyCollection<DomainDetailService> Services
         {
             get => GetDeserializedServices();
             set => ServicesAsString = JsonConvert.SerializeObject(value);
+        }
+
+        public IReadOnlyCollection<DomainDetailRecord> RecordSet
+        {
+            get => GetDeserializedRecordSet();
+            set => RecordSetAsString = JsonConvert.SerializeObject(value);
         }
 
         public void AddService(DomainDetailService service)
@@ -52,18 +59,21 @@ namespace Dns.Projections.Api.DomainDetail
             Services = services;
         }
 
-        private List<DomainDetailService> GetDeserializedServices()
-        {
-            return string.IsNullOrEmpty(ServicesAsString)
+        private List<DomainDetailService> GetDeserializedServices() =>
+            string.IsNullOrEmpty(ServicesAsString)
                 ? new List<DomainDetailService>()
                 : JsonConvert.DeserializeObject<List<DomainDetailService>>(ServicesAsString);
-        }
+
+        private List<DomainDetailRecord> GetDeserializedRecordSet() =>
+            string.IsNullOrEmpty(RecordSetAsString)
+                ? new List<DomainDetailRecord>()
+                : JsonConvert.DeserializeObject<List<DomainDetailRecord>>(RecordSetAsString);
 
         public class DomainDetailService
         {
-            public Guid ServiceId { get; set; }
+            public Guid ServiceId { get; }
             public string Type { get; }
-            public string Label { get; set; }
+            public string Label { get; }
 
             public DomainDetailService(
                 Guid serviceId,
@@ -76,24 +86,24 @@ namespace Dns.Projections.Api.DomainDetail
             }
         }
 
-        private string RecordSetAsString { get; set; }
-
-        public IReadOnlyCollection<DomainDetailRecord> RecordSet
-        {
-            get => GetDeserializedRecordSet();
-            set => RecordSetAsString = JsonConvert.SerializeObject(value);
-        }
-
-        private List<DomainDetailRecord> GetDeserializedRecordSet()
-        {
-            return string.IsNullOrEmpty(RecordSetAsString)
-                ? new List<DomainDetailRecord>()
-                : JsonConvert.DeserializeObject<List<DomainDetailRecord>>(RecordSetAsString);
-        }
-
         public class DomainDetailRecord
         {
-            // TODO: Services + complete recordset
+            public string Type { get; }
+            public int TimeToLive { get; }
+            public string Label { get; }
+            public string Value { get; }
+
+            public DomainDetailRecord(
+                string type,
+                int timeToLive,
+                string label,
+                string value)
+            {
+                Type = type;
+                TimeToLive = timeToLive;
+                Label = label;
+                Value = value;
+            }
         }
     }
 

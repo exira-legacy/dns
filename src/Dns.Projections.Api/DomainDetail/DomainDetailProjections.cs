@@ -1,5 +1,9 @@
 namespace Dns.Projections.Api.DomainDetail
 {
+    using System;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Domain.Events;
@@ -24,49 +28,49 @@ namespace Dns.Projections.Api.DomainDetail
                         }, ct);
             });
 
-            When<Envelope<RecordSetUpdated>>(async (context, message, ct) =>
-            {
-                await context.FindAndUpdateDomainDetail(
-                    message.Message.DomainName,
-                    domain =>
-                    {
-                        // TODO: Implement
-                    },
-                    ct);
-            });
-
             When<Envelope<GoogleSuiteWasAdded>>(async (context, message, ct) =>
-            {
-                await context.FindAndUpdateDomainDetail(
+                await AddService(context,
                     message.Message.DomainName,
-                    domain =>
-                    {
-                        // TODO: Implement
-                    },
-                    ct);
-            });
+                    message.Message.ServiceId,
+                    message.Message.ServiceType,
+                    message.Message.ServiceLabel,
+                    ct));
 
             When<Envelope<ManualWasAdded>>(async (context, message, ct) =>
-            {
-                await context.FindAndUpdateDomainDetail(
+                await AddService(context,
                     message.Message.DomainName,
-                    domain =>
-                    {
-                        // TODO: Implement
-                    },
-                    ct);
-            });
+                    message.Message.ServiceId,
+                    message.Message.ServiceType,
+                    message.Message.ServiceLabel,
+                    ct));
 
             When<Envelope<ServiceWasRemoved>>(async (context, message, ct) =>
-            {
                 await context.FindAndUpdateDomainDetail(
                     message.Message.DomainName,
-                    domain =>
-                    {
-                        // TODO: Implement
-                    },
-                    ct);
-            });
+                    domain => domain.RemoveService(message.Message.ServiceId),
+                    ct));
+
+            When<Envelope<RecordSetUpdated>>(async (context, message, ct) =>
+                await context.FindAndUpdateDomainDetail(
+                    message.Message.DomainName,
+                    domain => domain.RecordSet = message
+                            .Message
+                            .Records
+                            .Select(x => new DomainDetail.DomainDetailRecord(x.Type, x.TimeToLive, x.Label, x.Value))
+                            .ToList(),
+                    ct));
         }
+
+        private static async Task AddService(
+            ApiProjectionsContext context,
+            string domainName,
+            Guid serviceId,
+            string serviceType,
+            string serviceLabel,
+            CancellationToken ct) =>
+            await context.FindAndUpdateDomainDetail(
+                domainName,
+                domain => domain.AddService(new DomainDetail.DomainDetailService(serviceId, serviceType, serviceLabel)),
+                ct);
     }
 }

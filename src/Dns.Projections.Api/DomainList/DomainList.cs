@@ -12,7 +12,10 @@ namespace Dns.Projections.Api.DomainList
     public class DomainList
     {
         public static string CreatedAtTimestampBackingPropertyName = nameof(CreatedAtTimestampAsDateTimeOffset);
+        private DateTimeOffset CreatedAtTimestampAsDateTimeOffset { get; set; }
+
         public static string ServicesBackingPropertyName = nameof(ServicesAsString);
+        private string ServicesAsString { get; set; }
 
         public string Name { get; set; }
 
@@ -20,15 +23,11 @@ namespace Dns.Projections.Api.DomainList
 
         public string TopLevelDomain { get; set; }
 
-        private DateTimeOffset CreatedAtTimestampAsDateTimeOffset { get; set; }
-
         public Instant CreatedAtTimestamp
         {
             get => Instant.FromDateTimeOffset(CreatedAtTimestampAsDateTimeOffset);
             set => CreatedAtTimestampAsDateTimeOffset = value.ToDateTimeOffset();
         }
-
-        private string ServicesAsString { get; set; }
 
         public IReadOnlyCollection<DomainListService> Services
         {
@@ -51,18 +50,16 @@ namespace Dns.Projections.Api.DomainList
             Services = services;
         }
 
-        private List<DomainListService> GetDeserializedServices()
-        {
-            return string.IsNullOrEmpty(ServicesAsString)
+        private List<DomainListService> GetDeserializedServices() =>
+            string.IsNullOrEmpty(ServicesAsString)
                 ? new List<DomainListService>()
                 : JsonConvert.DeserializeObject<List<DomainListService>>(ServicesAsString);
-        }
 
         public class DomainListService
         {
-            public Guid ServiceId { get; set; }
+            public Guid ServiceId { get; }
             public string Type { get; }
-            public string Label { get; set; }
+            public string Label { get; }
 
             public DomainListService(
                 Guid serviceId,
