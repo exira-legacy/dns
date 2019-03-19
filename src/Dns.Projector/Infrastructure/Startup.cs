@@ -1,4 +1,4 @@
-namespace Dns.Api.Projector.Infrastructure
+namespace Dns.Projector.Infrastructure
 {
     using System;
     using System.Linq;
@@ -8,6 +8,7 @@ namespace Dns.Api.Projector.Infrastructure
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
+    using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using Configuration;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -113,6 +114,9 @@ namespace Dns.Api.Projector.Infrastructure
                     AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>(),
                 }
             });
+
+            var projectionsManager = serviceProvider.GetRequiredService<ConnectedProjectionsManager>();
+            projectionsManager.StartAllProjections();
         }
 
         private static string GetApiLeadingText(ApiVersionDescription description)

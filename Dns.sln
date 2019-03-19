@@ -48,7 +48,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Postman", "Postman", "{5D2F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dns.Projections.Api", "src\Dns.Projections.Api\Dns.Projections.Api.csproj", "{6298389E-05B0-4BB9-A213-DA6AF7D7915C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dns.Api.Projector", "src\Dns.Api.Projector\Dns.Api.Projector.csproj", "{BF5615A1-839C-4B97-AE40-AC7E5EB95E42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dns.Projector", "src\Dns.Projector\Dns.Projector.csproj", "{BF5615A1-839C-4B97-AE40-AC7E5EB95E42}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

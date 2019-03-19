@@ -1,4 +1,4 @@
-namespace Dns.Api.Projector.Infrastructure
+namespace Dns.Projector.Infrastructure
 {
     using System.Reflection;
     using System.Threading;

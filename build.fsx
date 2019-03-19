@@ -76,6 +76,9 @@ Target "Pack_Solution" (fun _ ->
 Target "Containerize_Api" (fun _ -> containerize "Dns.Api" "api")
 Target "PushContainer_Api" (fun _ -> push "api")
 
+Target "Containerize_Projector" (fun _ -> containerize "Dns.Projector" "projector")
+Target "PushContainer_Projector" (fun _ -> push "projector")
+
 // --------------------------------------------------------------------------------
 
 Target "Build" DoNothing
@@ -85,28 +88,30 @@ Target "Pack" DoNothing
 Target "Containerize" DoNothing
 Target "Push" DoNothing
 
-"NpmInstall"         ==> "Build"
-"DotNetCli"          ==> "Build"
-"Clean"              ==> "Build"
-"Restore_Solution"   ==> "Build"
-"Build_Solution"     ==> "Build"
+"NpmInstall"              ==> "Build"
+"DotNetCli"               ==> "Build"
+"Clean"                   ==> "Build"
+"Restore_Solution"        ==> "Build"
+"Build_Solution"          ==> "Build"
 
-"Build"              ==> "Test"
-"Test_Solution"      ==> "Test"
+"Build"                   ==> "Test"
+"Test_Solution"           ==> "Test"
 
-"Test"               ==> "Publish"
-"Publish_Solution"   ==> "Publish"
+"Test"                    ==> "Publish"
+"Publish_Solution"        ==> "Publish"
 
-"Publish"            ==> "Pack"
-"Pack_Solution"      ==> "Pack"
+"Publish"                 ==> "Pack"
+"Pack_Solution"           ==> "Pack"
 
-"Pack"               ==> "Containerize"
-"Containerize_Api"   ==> "Containerize"
+"Pack"                    ==> "Containerize"
+"Containerize_Api"        ==> "Containerize"
+"Containerize_Projector"  ==> "Containerize"
 // Possibly add more projects to containerize here
 
-"Containerize"       ==> "Push"
-"DockerLogin"        ==> "Push"
-"PushContainer_Api"  ==> "Push"
+"Containerize"            ==> "Push"
+"DockerLogin"             ==> "Push"
+"PushContainer_Api"       ==> "Push"
+"PushContainer_Projector" ==> "Push"
 // Possibly add more projects to push here
 
 // By default we build & test

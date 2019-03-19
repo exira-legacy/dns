@@ -1,4 +1,4 @@
-namespace Dns.Api.Projector.Infrastructure.Modules
+namespace Dns.Projector.Infrastructure.Modules
 {
     using System;
     using Autofac;

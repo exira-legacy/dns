@@ -1,4 +1,4 @@
-namespace Dns.Api.Projector.Infrastructure.Configuration
+namespace Dns.Projector.Infrastructure.Configuration
 {
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;

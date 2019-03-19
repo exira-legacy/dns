@@ -1,4 +1,4 @@
-namespace Dns.Api.Projector.Infrastructure.Modules
+namespace Dns.Projector.Infrastructure.Modules
 {
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Autofac;
@@ -71,8 +71,9 @@ namespace Dns.Api.Projector.Infrastructure.Modules
                     _services,
                     _loggerFactory));
 
-            builder.RegisterProjections<DomainDetailProjections, ApiProjectionsContext>();
-            builder.RegisterProjections<DomainListProjections, ApiProjectionsContext>();
+            builder
+                .RegisterProjections<DomainDetailProjections, ApiProjectionsContext>()
+                .RegisterProjections<DomainListProjections, ApiProjectionsContext>();
         }
     }
 }

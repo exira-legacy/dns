@@ -1,4 +1,4 @@
-namespace Dns.Api.Projector.Projections
+namespace Dns.Projector.Projections
 {
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
