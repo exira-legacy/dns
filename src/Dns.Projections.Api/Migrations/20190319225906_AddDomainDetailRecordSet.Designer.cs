@@ -4,14 +4,16 @@ using Dns.Projections.Api;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Dns.Projections.Api.Migrations
 {
     [DbContext(typeof(ApiProjectionsContext))]
-    partial class ApiProjectionsContextModelSnapshot : ModelSnapshot
+    [Migration("20190319225906_AddDomainDetailRecordSet")]
+    partial class AddDomainDetailRecordSet
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
