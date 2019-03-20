@@ -5,9 +5,9 @@ namespace Dns.Domain.Events
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Newtonsoft.Json;
 
-    [EventName("RecordSetUpdated")]
+    [EventName("RecordSetWasUpdated")]
     [EventDescription("The complete record set was updated.")]
-    public class RecordSetUpdated
+    public class RecordSetWasUpdated
     {
         [JsonIgnore]
         public string DomainName { get; }
@@ -16,7 +16,7 @@ namespace Dns.Domain.Events
 
         public RecordData[] Records { get; }
 
-        public RecordSetUpdated(
+        public RecordSetWasUpdated(
             DomainName domainName,
             RecordSet recordSet)
         {
@@ -30,7 +30,7 @@ namespace Dns.Domain.Events
         }
 
         [JsonConstructor]
-        private RecordSetUpdated(
+        private RecordSetWasUpdated(
             string secondLevelDomain,
             string topLevelDomain,
             IReadOnlyCollection<RecordData> records)

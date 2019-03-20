@@ -53,7 +53,7 @@ namespace Dns.Domain
         private void UpdateRecordSet()
         {
             ApplyChange(
-                new RecordSetUpdated(
+                new RecordSetWasUpdated(
                     _name,
                     _services.Values.Aggregate(
                         new RecordSet(),

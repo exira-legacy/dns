@@ -46,7 +46,7 @@ namespace Dns.Tests
                 .When(new AddManual(domainName, serviceId, label, recordset))
                 .Then(domainName,
                     new ManualWasAdded(domainName, serviceId, label, recordset),
-                    new RecordSetUpdated(domainName, manualService.GetRecords())));
+                    new RecordSetWasUpdated(domainName, manualService.GetRecords())));
         }
 
         [Fact]

@@ -39,7 +39,7 @@ namespace Dns.Tests
                 .When(new AddGoogleSuite(domainName, serviceId, verificationToken))
                 .Then(domainName,
                     new GoogleSuiteWasAdded(domainName, serviceId, verificationToken),
-                    new RecordSetUpdated(domainName, googleService.GetRecords())));
+                    new RecordSetWasUpdated(domainName, googleService.GetRecords())));
         }
 
         [Fact]

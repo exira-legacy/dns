@@ -50,7 +50,7 @@ namespace Dns.Projections.Api.DomainDetail
                     domain => domain.RemoveService(message.Message.ServiceId),
                     ct));
 
-            When<Envelope<RecordSetUpdated>>(async (context, message, ct) =>
+            When<Envelope<RecordSetWasUpdated>>(async (context, message, ct) =>
                 await context.FindAndUpdateDomainDetail(
                     message.Message.DomainName,
                     domain => domain.RecordSet = message

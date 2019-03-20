@@ -38,7 +38,7 @@ namespace Dns.Tests
                 .When(new RemoveService(domainName, serviceId))
                 .Then(domainName,
                     new ServiceWasRemoved(domainName, serviceId),
-                    new RecordSetUpdated(domainName, new RecordSet())));
+                    new RecordSetWasUpdated(domainName, new RecordSet())));
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace Dns.Tests
                 .When(new RemoveService(domainName, serviceId2))
                 .Then(domainName,
                     new ServiceWasRemoved(domainName, serviceId2),
-                    new RecordSetUpdated(domainName, googleService.GetRecords())));
+                    new RecordSetWasUpdated(domainName, googleService.GetRecords())));
         }
 
         [Fact]

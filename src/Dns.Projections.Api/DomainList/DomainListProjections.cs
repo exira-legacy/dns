@@ -49,7 +49,7 @@ namespace Dns.Projections.Api.DomainList
                     domain => domain.RemoveService(message.Message.ServiceId),
                     ct));
 
-            When<Envelope<RecordSetUpdated>>(async (context, message, ct) =>
+            When<Envelope<RecordSetWasUpdated>>(async (context, message, ct) =>
                 await context.FindAndUpdateDomainList(
                     message.Message.DomainName,
                     domain => { }, // We don't care about recordset in the domain list
