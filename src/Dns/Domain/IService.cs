@@ -9,5 +9,7 @@ namespace Dns.Domain
         ServiceLabel Label { get; }
 
         RecordSet GetRecords();
+
+        string GetServiceData();
     }
 }

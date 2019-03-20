@@ -6,10 +6,15 @@ namespace Dns
 
     public class ServiceLabel : StringValueObject<ServiceLabel>
     {
+        public const int MaxLength = 500;
+
         public ServiceLabel([JsonProperty("value")] string label) : base(label)
         {
             if (string.IsNullOrWhiteSpace(Value))
                 throw new EmptyServiceLabelException();
+
+            if (Value.Length > MaxLength)
+                throw new ServiceLabelTooLongException();
         }
     }
 }

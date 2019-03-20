@@ -1,5 +1,7 @@
 namespace Dns.Domain.Services.GoogleSuite
 {
+    using Newtonsoft.Json;
+
     public class GoogleSuiteService : IService
     {
         private readonly GoogleVerificationToken _verificationToken;
@@ -40,5 +42,17 @@ namespace Dns.Domain.Services.GoogleSuite
 
         private static Record CreateRecord(RecordType type, int ttl, string label, string value) =>
             new Record(type, new TimeToLive(ttl), new RecordLabel(label), new RecordValue(value));
+
+        public string GetServiceData() => JsonConvert.SerializeObject(new ServiceData(this));
+
+        public class ServiceData
+        {
+            public GoogleVerificationToken VerificationToken { get; set; }
+
+            public ServiceData(GoogleSuiteService service)
+            {
+                VerificationToken = service._verificationToken;
+            }
+        }
     }
 }

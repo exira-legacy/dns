@@ -24,4 +24,9 @@ namespace Dns.Exceptions
     {
         public EmptyServiceLabelException() : base("Service Label cannot be empty.") { }
     }
+
+    public class ServiceLabelTooLongException : InvalidServiceLabelException
+    {
+        public ServiceLabelTooLongException() : base($"Label of a service cannot be longer than {ServiceLabel.MaxLength} characters.") { }
+    }
 }

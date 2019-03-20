@@ -2,6 +2,7 @@ namespace Dns.Api.Domain.Responses
 {
     using System;
     using System.Runtime.Serialization;
+    using Projections.Api.ServiceDetail;
     using Swashbuckle.AspNetCore.Filters;
 
     [DataContract(Name = "DomainService", Namespace = "")]
@@ -11,7 +12,7 @@ namespace Dns.Api.Domain.Responses
         /// Id of the domain service.
         /// </summary>
         [DataMember(Name = "Id", Order = 1)]
-        public ServiceId Id { get; set; }
+        public Guid ServiceId { get; set; }
 
         /// <summary>
         /// Type of the domain service.
@@ -20,25 +21,36 @@ namespace Dns.Api.Domain.Responses
         public string Type { get; set; }
 
         /// <summary>
-        /// Name of the domain service.
+        /// Descriptive label of the domain service.
         /// </summary>
-        [DataMember(Name = "Name", Order = 3)]
-        public string Name { get; set; }
+        [DataMember(Name = "Label", Order = 3)]
+        public string Label { get; set; }
+
+        /// <summary>
+        /// Domain service specific data.
+        /// </summary>
+        [DataMember(Name = "Data", Order = 3)]
+        public string Data { get; set; }
 
         public DomainServiceDetailResponse(
-            ServiceId id,
-            string type,
-            string name)
+            ServiceDetail service)
         {
-            Id = id;
-            Type = type;
-            Name = name;
+            ServiceId = service.ServiceId;
+            Type = service.Type;
+            Label = service.Label;
+            Data = service.ServiceData;
         }
     }
 
     public class DomainServiceResponseExamples : IExamplesProvider
     {
         public object GetExamples()
-            => new DomainServiceDetailResponse(new ServiceId(Guid.NewGuid()), ServiceType.manual.Value, "My Mail Services");
+            => new DomainServiceDetailResponse(
+                new ServiceDetail
+                {
+                    ServiceId = Guid.NewGuid(),
+                    Type = ServiceType.manual.Value,
+                    Label = "My Mail Services"
+                });
     }
 }

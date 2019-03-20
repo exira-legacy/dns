@@ -1,5 +1,7 @@
 namespace Dns.Domain.Services.Manual
 {
+    using Newtonsoft.Json;
+
     public class ManualService : IService
     {
         private readonly ManualLabel _label;
@@ -24,5 +26,19 @@ namespace Dns.Domain.Services.Manual
         }
 
         public RecordSet GetRecords() => _records;
+
+        public string GetServiceData() => JsonConvert.SerializeObject(new ServiceData(this));
+
+        public class ServiceData
+        {
+            public ManualLabel Label { get; set; }
+            public RecordSet Records { get; set; }
+
+            public ServiceData(ManualService service)
+            {
+                Label = service._label;
+                Records = service._records;
+            }
+        }
     }
 }

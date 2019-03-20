@@ -62,7 +62,6 @@ namespace Dns.Api.Domain
             // TODO: Sending null for top level domain should give a decent error, not 500
             // TODO: Apikey description in documentation should be translatable
             // TODO: Add bad format response code if it is not json
-            // TODO: Add endpoint to list services
 
             return Accepted(
                 $"/v1/domains/{command.DomainName}",
@@ -207,19 +206,24 @@ namespace Dns.Api.Domain
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(DomainServiceResponseExamples), jsonConverter: typeof(StringEnumConverter))]
-        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(DomainNotFoundResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(ServiceNotFoundResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         public async Task<IActionResult> GetService(
             [FromServices] ApiProjectionsContext context,
             [FromRoute] string secondLevelDomain,
             [FromRoute] string topLevelDomain,
-            [FromRoute] ServiceId serviceId,
+            [FromRoute] Guid serviceId,
             CancellationToken cancellationToken = default)
         {
-            // TODO: Implement getting from context
+            var service = await context
+                .ServiceDetails
+                .FindAsync(new object[] { serviceId }, cancellationToken);
+
+            if (service == null)
+                throw new ApiException(ServiceNotFoundResponseExamples.Message, StatusCodes.Status404NotFound);
 
             return Ok(
-                new DomainServiceDetailResponse(null, null, null));
+                new DomainServiceDetailResponse(service));
         }
     }
 }

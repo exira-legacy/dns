@@ -10,6 +10,7 @@ namespace Dns.Projections.Api
 
         public DbSet<DomainDetail.DomainDetail> DomainDetails { get; set; }
         public DbSet<DomainList.DomainList> DomainList { get; set; }
+        public DbSet<ServiceDetail.ServiceDetail> ServiceDetails { get; set; }
 
         // This needs to be here to please EF
         public ApiProjectionsContext() { }
