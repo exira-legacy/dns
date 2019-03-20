@@ -1,4 +1,4 @@
-namespace Dns.Api.Infrastructure
+namespace Dns.Api.Infrastructure.Responses
 {
     using System.Runtime.Serialization;
 

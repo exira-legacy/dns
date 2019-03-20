@@ -11,6 +11,7 @@ namespace Dns.Api.Infrastructure
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.AspNetCore;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Configuration;
+    using Domain.Exceptions;
     using Exceptions;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;

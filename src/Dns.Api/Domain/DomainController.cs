@@ -12,6 +12,7 @@ namespace Dns.Api.Domain
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Infrastructure;
+    using Infrastructure.Responses;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;

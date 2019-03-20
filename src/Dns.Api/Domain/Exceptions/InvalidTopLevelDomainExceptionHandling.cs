@@ -1,7 +1,8 @@
-namespace Dns.Api.Infrastructure.Exceptions
+namespace Dns.Api.Domain.Exceptions
 {
     using System.Net;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Infrastructure.Exceptions;
 
     public class InvalidTopLevelDomainExceptionHandling : DefaultExceptionHandler<InvalidTopLevelDomainException>
     {

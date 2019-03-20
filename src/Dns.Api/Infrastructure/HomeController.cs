@@ -1,10 +1,11 @@
 namespace Dns.Api.Infrastructure
 {
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Runtime.Serialization;
     using Be.Vlaanderen.Basisregisters.Api;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Newtonsoft.Json.Converters;
+    using Responses;
+    using Swashbuckle.AspNetCore.Filters;
 
     [ApiVersion("1.0")]
     [AdvertiseApiVersions("1.0")]
@@ -12,25 +13,12 @@ namespace Dns.Api.Infrastructure
     [ApiExplorerSettings(GroupName = "Home")]
     public class HomeController : ApiController
     {
-        [HttpGet]
-        public IActionResult Get() => Ok(new HomeResponse());
-    }
-
-    [DataContract(Name = "Home", Namespace = "")]
-    public class HomeResponse
-    {
         /// <summary>
-        /// Hypermedia links
+        /// Initial entry point of the API.
         /// </summary>
-        [DataMember(Name = "Links", Order = 1)]
-        public List<Link> Links { get; set; }
-
-        public HomeResponse()
-        {
-            Links = new List<Link>
-            {
-                new Link("/domains", Link.Relations.Domains, WebRequestMethods.Http.Get)
-            };
-        }
+        [HttpGet]
+        [ProducesResponseType(typeof(HomeResponse), StatusCodes.Status200OK)]
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(HomeResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        public IActionResult Get() => Ok(new HomeResponse());
     }
 }

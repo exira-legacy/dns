@@ -4,7 +4,7 @@ namespace Dns.Api.Domain.Responses
     using System.Collections.Generic;
     using System.Net;
     using System.Runtime.Serialization;
-    using Infrastructure;
+    using Infrastructure.Responses;
     using Projections.Api.ServiceDetail;
     using Swashbuckle.AspNetCore.Filters;
 
@@ -67,7 +67,8 @@ namespace Dns.Api.Domain.Responses
                 {
                     ServiceId = Guid.NewGuid(),
                     Type = ServiceType.manual.Value,
-                    Label = "My Mail Services"
+                    Label = "My Mail Services",
+                    ServiceData = "<json escaped service specific data>"
                 });
     }
 }

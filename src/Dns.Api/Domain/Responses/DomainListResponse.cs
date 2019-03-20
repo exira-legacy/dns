@@ -5,7 +5,7 @@ namespace Dns.Api.Domain.Responses
     using System.Linq;
     using System.Net;
     using System.Runtime.Serialization;
-    using Infrastructure;
+    using Infrastructure.Responses;
     using Projections.Api.DomainList;
     using Swashbuckle.AspNetCore.Filters;
 
@@ -29,6 +29,7 @@ namespace Dns.Api.Domain.Responses
             Links = new List<Link>
             {
                 new Link("/", Link.Relations.Home, WebRequestMethods.Http.Get),
+                new Link("/domains", Link.Relations.Domains, WebRequestMethods.Http.Post)
             };
         }
     }

@@ -5,7 +5,7 @@ namespace Dns.Api.Domain.Responses
     using System.Linq;
     using System.Net;
     using System.Runtime.Serialization;
-    using Infrastructure;
+    using Infrastructure.Responses;
     using Projections.Api.DomainDetail;
     using Swashbuckle.AspNetCore.Filters;
 
@@ -69,7 +69,9 @@ namespace Dns.Api.Domain.Responses
             {
                 new Link("/", Link.Relations.Home, WebRequestMethods.Http.Get),
                 new Link("/domains", Link.Relations.Domains, WebRequestMethods.Http.Get),
-                new Link($"/domains/{domainDetail.Name}/services", Link.Relations.Services, WebRequestMethods.Http.Get)
+                new Link($"/domains/{domainDetail.Name}/services", Link.Relations.Services, WebRequestMethods.Http.Get),
+                new Link($"/domains/{domainDetail.Name}/services/{ServiceType.manual.Value}", Link.Relations.Service, WebRequestMethods.Http.Post),
+                new Link($"/domains/{domainDetail.Name}/services/{ServiceType.googlesuite.Value}", Link.Relations.Service, WebRequestMethods.Http.Post)
             };
         }
     }
