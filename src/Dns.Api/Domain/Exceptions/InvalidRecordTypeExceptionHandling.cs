@@ -4,9 +4,9 @@ namespace Dns.Api.Domain.Exceptions
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Infrastructure.Exceptions;
 
-    public class InvalidTopLevelDomainExceptionHandling : DefaultExceptionHandler<InvalidTopLevelDomainException>
+    public class InvalidRecordTypeExceptionHandling : DefaultExceptionHandler<InvalidRecordTypeException>
     {
-        protected override BasicApiProblem GetApiProblemFor(InvalidTopLevelDomainException exception)
+        protected override BasicApiProblem GetApiProblemFor(InvalidRecordTypeException exception)
         {
             return new BasicApiProblem
             {

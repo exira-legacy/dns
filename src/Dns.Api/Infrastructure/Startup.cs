@@ -110,6 +110,9 @@ namespace Dns.Api.Infrastructure
                         new AggregateNotFoundExceptionHandling(),
                         new WrongExpectedVersionExceptionHandling(),
                         new InvalidTopLevelDomainExceptionHandling(),
+                        new InvalidRecordTypeExceptionHandling(),
+                        new InvalidServiceTypeExceptionHandling(),
+                        new ValidationExceptionHandling(),
                     }
                 },
                 Server =

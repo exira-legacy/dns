@@ -11,7 +11,8 @@ namespace Dns.Api.Domain
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
-    using FluentValidation.AspNetCore;
+    using Exceptions;
+    using FluentValidation;
     using Infrastructure;
     using Infrastructure.Responses;
     using Microsoft.AspNetCore.Http;
@@ -45,20 +46,20 @@ namespace Dns.Api.Domain
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(typeof(void), StatusCodes.Status202Accepted)]
-        [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BasicApiValidationProblem), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
         [SwaggerRequestExample(typeof(CreateDomainRequest), typeof(CreateDomainRequestExample))]
         [SwaggerResponseExample(StatusCodes.Status202Accepted, typeof(EmptyResponseExamples), jsonConverter: typeof(StringEnumConverter))]
-        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(ValidationErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
-        public async Task<IActionResult> Post(
+        public async Task<IActionResult> CreateDomain(
             [FromServices] ICommandHandlerResolver bus,
             [FromCommandId] Guid commandId,
             [FromBody] CreateDomainRequest request,
             CancellationToken cancellationToken = default)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            await new CreateDomainRequestValidator()
+                .ValidateAndThrowAsync(request, cancellationToken: cancellationToken);
 
             var command = CreateDomainRequestMapping.Map(request);
 
@@ -121,14 +122,17 @@ namespace Dns.Api.Domain
         /// <param name="topLevelDomain">Top level domain of the domain to list details for.</param>
         /// <param name="cancellationToken"></param>
         /// <response code="200">If the domain is found.</response>
+        /// <response code="400">If the request contains invalid data.</response>
         /// <response code="404">If the domain does not exist.</response>
         /// <response code="500">If an internal error has occurred.</response>
         /// <returns></returns>
         [HttpGet("{secondLevelDomain}.{topLevelDomain}")]
         [ProducesResponseType(typeof(DomainDetailResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BasicApiValidationProblem), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(DomainResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(ValidationErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(DomainNotFoundResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         public async Task<IActionResult> DetailDomain(
@@ -143,12 +147,8 @@ namespace Dns.Api.Domain
                 TopLevelDomain = topLevelDomain,
             };
 
-            var validator = new DetailDomainRequestValidator();
-            var validationResult = await validator.ValidateAsync(request, cancellationToken);
-
-            validationResult.AddToModelState(ModelState, "request");
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            await new DetailDomainRequestValidator()
+                .ValidateAndThrowAsync(request, cancellationToken: cancellationToken);
 
             var domain = await FindDomainAsync(context, secondLevelDomain, topLevelDomain, cancellationToken);
 
@@ -164,14 +164,17 @@ namespace Dns.Api.Domain
         /// <param name="topLevelDomain">Top level domain of the domain to list services for.</param>
         /// <param name="cancellationToken"></param>
         /// <response code="200">If the domain is found.</response>
+        /// <response code="400">If the request contains invalid data.</response>
         /// <response code="404">If the domain does not exist.</response>
         /// <response code="500">If an internal error has occurred.</response>
         /// <returns></returns>
         [HttpGet("{secondLevelDomain}.{topLevelDomain}/services")]
         [ProducesResponseType(typeof(DomainServiceListResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BasicApiValidationProblem), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(DomainServiceListResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(ValidationErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(DomainNotFoundResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         public async Task<IActionResult> ListServices(
@@ -186,12 +189,8 @@ namespace Dns.Api.Domain
                 TopLevelDomain = topLevelDomain,
             };
 
-            var validator = new ListServicesRequestValidator();
-            var validationResult = await validator.ValidateAsync(request, cancellationToken);
-
-            validationResult.AddToModelState(ModelState, "request");
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            await new ListServicesRequestValidator()
+                .ValidateAndThrowAsync(request, cancellationToken: cancellationToken);
 
             var domain = await FindDomainAsync(context, secondLevelDomain, topLevelDomain, cancellationToken);
 
@@ -214,14 +213,17 @@ namespace Dns.Api.Domain
         /// <param name="serviceId">Unique service id to get details for.</param>
         /// <param name="cancellationToken"></param>
         /// <response code="200">If the domain and domain service is found.</response>
+        /// <response code="400">If the request contains invalid data.</response>
         /// <response code="404">If the domain or domain service does not exist.</response>
         /// <response code="500">If an internal error has occurred.</response>
         /// <returns></returns>
         [HttpGet("{secondLevelDomain}.{topLevelDomain}/services/{serviceId}")]
         [ProducesResponseType(typeof(DomainServiceDetailResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BasicApiValidationProblem), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(DomainServiceResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(ValidationErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(ServiceNotFoundResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         public async Task<IActionResult> DetailService(
@@ -237,12 +239,8 @@ namespace Dns.Api.Domain
                 TopLevelDomain = topLevelDomain,
             };
 
-            var validator = new DetailServiceRequestValidator();
-            var validationResult = await validator.ValidateAsync(request, cancellationToken);
-
-            validationResult.AddToModelState(ModelState, "request");
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            await new DetailServiceRequestValidator()
+                .ValidateAndThrowAsync(request, cancellationToken: cancellationToken);
 
             var service = await FindServiceAsync(context, serviceId, cancellationToken);
 
@@ -263,17 +261,20 @@ namespace Dns.Api.Domain
         /// <param name="serviceId">Unique service id to remove.</param>
         /// <param name="cancellationToken"></param>
         /// <response code="202">If the request has been accepted.</response>
+        /// <response code="400">If the request contains invalid data.</response>
         /// <response code="404">If the domain or domain service does not exist.</response>
         /// <response code="500">If an internal error has occurred.</response>
         /// <returns></returns>
         [HttpDelete("{secondLevelDomain}.{topLevelDomain}/services/{serviceId}")]
         [ProducesResponseType(typeof(void), StatusCodes.Status202Accepted)]
+        [ProducesResponseType(typeof(BasicApiValidationProblem), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
         [SwaggerResponseExample(StatusCodes.Status202Accepted, typeof(EmptyResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(ValidationErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(ServiceNotFoundResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
-        public async Task<IActionResult> DeleteService(
+        public async Task<IActionResult> RemoveService(
             [FromServices] ICommandHandlerResolver bus,
             [FromServices] ApiProjectionsContext context,
             [FromCommandId] Guid commandId,
@@ -289,12 +290,8 @@ namespace Dns.Api.Domain
                 ServiceId = serviceId
             };
 
-            var validator = new RemoveServiceRequestValidator();
-            var validationResult = await validator.ValidateAsync(request, cancellationToken);
-
-            validationResult.AddToModelState(ModelState, "request");
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            await new RemoveServiceRequestValidator()
+                .ValidateAndThrowAsync(request, cancellationToken: cancellationToken);
 
             await FindServiceAsync(context, serviceId, cancellationToken);
 
