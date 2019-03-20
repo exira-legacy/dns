@@ -6,6 +6,7 @@ namespace Dns.Api.Domain.Requests
     using System.Linq;
     using Dns.Domain.Services.Manual;
     using Dns.Domain.Services.Manual.Commands;
+    using FluentValidation;
     using Swashbuckle.AspNetCore.Filters;
 
     public class RecordData
@@ -27,7 +28,7 @@ namespace Dns.Api.Domain.Requests
     {
         /// <summary>Service id of the manual service to add.</summary>
         [Required]
-        public Guid ServiceId { get; set; }
+        public Guid? ServiceId { get; set; }
 
         /// <summary>Label of the manual service to add.</summary>
         [Required]
@@ -36,6 +37,38 @@ namespace Dns.Api.Domain.Requests
         /// <summary>Records of the manual service to add.</summary>
         [Required]
         public List<RecordData> Records { get; set; }
+
+        [Required]
+        [Display(Name = "Second Level Domain")]
+        internal string SecondLevelDomain { get; set; }
+
+        [Required]
+        [Display(Name = "Top Level Domain")]
+        internal string TopLevelDomain { get; set; }
+    }
+
+    public class AddManualServiceRequestValidator : AbstractValidator<AddManualServiceRequest>
+    {
+        public AddManualServiceRequestValidator()
+        {
+            RuleFor(x => x.SecondLevelDomain)
+                .Required()
+                .ValidHostName()
+                .MaxLength(SecondLevelDomain.MaxLength);
+
+            RuleFor(x => x.TopLevelDomain)
+                .Required()
+                .ValidTopLevelDomain();
+
+            RuleFor(x => x.ServiceId)
+                .Required();
+
+            RuleFor(x => x.Label)
+                .Required()
+                .MaxLength(ServiceLabel.MaxLength);
+
+            // TODO: Validation rules for Records
+        }
     }
 
     public class AddManualServiceRequestExample : IExamplesProvider
@@ -68,7 +101,7 @@ namespace Dns.Api.Domain.Requests
         {
             return new AddManual(
                 domainName,
-                new ServiceId(message.ServiceId),
+                new ServiceId(message.ServiceId.Value),
                 new ManualLabel(message.Label),
                 new RecordSet(message.Records.Select(x => x.ToRecord())));
         }

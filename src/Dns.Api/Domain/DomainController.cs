@@ -12,7 +12,6 @@ namespace Dns.Api.Domain
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
     using Exceptions;
-    using FluentValidation;
     using Infrastructure;
     using Infrastructure.Responses;
     using Microsoft.AspNetCore.Http;
@@ -63,7 +62,6 @@ namespace Dns.Api.Domain
 
             var command = CreateDomainRequestMapping.Map(request);
 
-            // TODO: Sending an empty body should give a proper bad request
             // TODO: Sending null for top level domain should give a decent error, not 500
             // TODO: Apikey description in documentation should be translatable
             // TODO: Add bad format response code if it is not json
@@ -230,7 +228,7 @@ namespace Dns.Api.Domain
             [FromServices] ApiProjectionsContext context,
             [FromRoute] string secondLevelDomain,
             [FromRoute] string topLevelDomain,
-            [FromRoute] Guid serviceId,
+            [FromRoute] Guid? serviceId,
             CancellationToken cancellationToken = default)
         {
             var request = new DetailServiceRequest
@@ -280,7 +278,7 @@ namespace Dns.Api.Domain
             [FromCommandId] Guid commandId,
             [FromRoute] string secondLevelDomain,
             [FromRoute] string topLevelDomain,
-            [FromRoute] Guid serviceId,
+            [FromRoute] Guid? serviceId,
             CancellationToken cancellationToken = default)
         {
             var request = new RemoveServiceRequest
@@ -326,12 +324,12 @@ namespace Dns.Api.Domain
 
         private static async Task<ServiceDetail> FindServiceAsync(
             ApiProjectionsContext context,
-            Guid serviceId,
+            Guid? serviceId,
             CancellationToken cancellationToken)
         {
             var service = await context
                 .ServiceDetails
-                .FindAsync(new object[] { serviceId }, cancellationToken);
+                .FindAsync(new object[] { serviceId.Value }, cancellationToken);
 
             if (service == null)
                 throw new ApiException(ServiceNotFoundResponseExamples.Message, StatusCodes.Status404NotFound);

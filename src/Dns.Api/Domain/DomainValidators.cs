@@ -6,6 +6,11 @@ namespace Dns.Api.Domain
 
     public static class DomainValidators
     {
+        public static IRuleBuilderOptions<T, Guid?> Required<T>(this IRuleBuilder<T, Guid?> ruleBuilder)
+            => ruleBuilder
+                .NotEmpty()
+                .WithMessage("{PropertyName} is required.");
+
         public static IRuleBuilderOptions<T, string> Required<T>(this IRuleBuilder<T, string> ruleBuilder)
             => ruleBuilder
                 .NotEmpty()

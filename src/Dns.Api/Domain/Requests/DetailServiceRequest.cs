@@ -36,8 +36,7 @@ namespace Dns.Api.Domain.Requests
                 .ValidTopLevelDomain();
 
             RuleFor(x => x.ServiceId)
-                .NotNull()
-                .NotEmpty();
+                .Required();
         }
     }
 }

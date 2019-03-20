@@ -31,6 +31,7 @@ namespace Dns.Domain
         public void AddGoogleSuite(ServiceId serviceId, GoogleVerificationToken verificationToken)
         {
             CheckIfServiceAlreadyExists(serviceId);
+            // TODO: Also check if there is already a google suite service?
             ApplyChange(new GoogleSuiteWasAdded(_name, serviceId, verificationToken));
             UpdateRecordSet();
         }

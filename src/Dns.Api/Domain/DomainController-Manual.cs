@@ -6,10 +6,12 @@ namespace Dns.Api.Domain
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
+    using Exceptions;
     using Infrastructure.Responses;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Newtonsoft.Json.Converters;
+    using Projections.Api;
     using Requests;
     using Swashbuckle.AspNetCore.Filters;
 
@@ -19,6 +21,7 @@ namespace Dns.Api.Domain
         /// Add a manual service to a domain.
         /// </summary>
         /// <param name="bus"></param>
+        /// <param name="context"></param>
         /// <param name="commandId">Optional unique identifier for the request.</param>
         /// <param name="secondLevelDomain">Second level domain of the domain to add a manual service to.</param>
         /// <param name="topLevelDomain">Top level domain of the domain to add a manual service to.</param>
@@ -30,24 +33,31 @@ namespace Dns.Api.Domain
         /// <returns></returns>
         [HttpPost("{secondLevelDomain}.{topLevelDomain}/services/manual")]
         [ProducesResponseType(typeof(void), StatusCodes.Status202Accepted)]
-        [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(BasicApiValidationProblem), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
         [SwaggerRequestExample(typeof(AddManualServiceRequest), typeof(AddManualServiceRequestExample))]
         [SwaggerResponseExample(StatusCodes.Status202Accepted, typeof(EmptyResponseExamples), jsonConverter: typeof(StringEnumConverter))]
-        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(BadRequestResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(ValidationErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         public async Task<IActionResult> AddManualService(
             [FromServices] ICommandHandlerResolver bus,
+            [FromServices] ApiProjectionsContext context,
             [FromCommandId] Guid commandId,
             [FromRoute] string secondLevelDomain,
             [FromRoute] string topLevelDomain,
             [FromBody] AddManualServiceRequest request,
             CancellationToken cancellationToken = default)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            if (request != null)
+            {
+                request.SecondLevelDomain = secondLevelDomain;
+                request.TopLevelDomain = topLevelDomain;
+            }
 
-            // TODO: Add validator
+            await new AddManualServiceRequestValidator()
+                .ValidateAndThrowAsync(request, cancellationToken: cancellationToken);
+
+            await FindDomainAsync(context, secondLevelDomain, topLevelDomain, cancellationToken);
 
             var command = AddManualServiceRequestMapping.Map(
                 new DomainName(
