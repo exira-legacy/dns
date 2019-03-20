@@ -6,6 +6,7 @@ namespace Dns.Tests
     using Domain.Services.GoogleSuite;
     using Domain.Services.GoogleSuite.Commands;
     using Domain.Services.GoogleSuite.Events;
+    using Domain.Services.GoogleSuite.Exceptions;
     using Exceptions;
     using Infrastructure;
     using Xunit;
@@ -55,6 +56,24 @@ namespace Dns.Tests
                     new GoogleSuiteWasAdded(domainName, serviceId, verificationToken))
                 .When(new AddGoogleSuite(domainName, serviceId, verificationToken))
                 .Throws(new ServiceAlreadyExistsException(serviceId)));
+        }
+
+        [Fact]
+        public void adding_more_than_one_google_suite_should_be_impossible()
+        {
+            var domainName = Fixture.Create<DomainName>();
+            var serviceId = Fixture.Create<ServiceId>();
+            var verificationToken = Fixture.Create<GoogleVerificationToken>();
+
+            var serviceId2 = Fixture.Create<ServiceId>();
+            var verificationToken2 = Fixture.Create<GoogleVerificationToken>();
+
+            Assert(new Scenario()
+                .Given(domainName,
+                    new DomainWasCreated(domainName),
+                    new GoogleSuiteWasAdded(domainName, serviceId, verificationToken))
+                .When(new AddGoogleSuite(domainName, serviceId2, verificationToken2))
+                .Throws(new GoogleSuiteServiceAlreadyExistsException()));
         }
     }
 }

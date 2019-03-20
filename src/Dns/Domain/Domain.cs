@@ -7,6 +7,7 @@ namespace Dns.Domain
     using Exceptions;
     using Services.GoogleSuite;
     using Services.GoogleSuite.Events;
+    using Services.GoogleSuite.Exceptions;
     using Services.Manual;
     using Services.Manual.Events;
 
@@ -31,7 +32,10 @@ namespace Dns.Domain
         public void AddGoogleSuite(ServiceId serviceId, GoogleVerificationToken verificationToken)
         {
             CheckIfServiceAlreadyExists(serviceId);
-            // TODO: Also check if there is already a google suite service?
+
+            if (_services.Any(x => x.Value.Type.Value == ServiceType.googlesuite.Value))
+                throw new GoogleSuiteServiceAlreadyExistsException();
+
             ApplyChange(new GoogleSuiteWasAdded(_name, serviceId, verificationToken));
             UpdateRecordSet();
         }
