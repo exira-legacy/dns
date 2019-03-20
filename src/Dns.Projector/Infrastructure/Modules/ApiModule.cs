@@ -55,7 +55,7 @@ namespace Dns.Projector.Infrastructure.Modules
 
                 .RegisterEventstreamModule(_configuration)
 
-                .RegisterModule<ProjectorModule>();
+                .RegisterModule(new ProjectorModule(_loggerFactory));
 
             RegisterApiProjections(builder);
         }
@@ -63,10 +63,6 @@ namespace Dns.Projector.Infrastructure.Modules
         private void RegisterApiProjections(ContainerBuilder builder)
         {
             builder
-                .RegisterProjectionMigrator<ApiProjectionsContextMigrationFactory>(
-                    _configuration,
-                    _loggerFactory)
-
                 .RegisterModule(
                     new ApiProjectionsModule(
                         _configuration,
@@ -74,6 +70,10 @@ namespace Dns.Projector.Infrastructure.Modules
                         _loggerFactory));
 
             builder
+                .RegisterProjectionMigrator<ApiProjectionsContextMigrationFactory>(
+                    _configuration,
+                    _loggerFactory)
+
                 .RegisterProjections<DomainDetailProjections, ApiProjectionsContext>()
                 .RegisterProjections<DomainListProjections, ApiProjectionsContext>();
         }

@@ -11,7 +11,7 @@ namespace Dns.Projector.Projections
     [ApiExplorerSettings(GroupName = "Projections")]
     public class ProjectionsController : DefaultProjectorController
     {
-        public ProjectionsController(ConnectedProjectionsManager connectedProjectionsManager)
+        public ProjectionsController(IConnectedProjectionsManager connectedProjectionsManager)
             : base(connectedProjectionsManager) { }
     }
 }
