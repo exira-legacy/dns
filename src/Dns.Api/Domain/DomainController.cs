@@ -11,6 +11,7 @@ namespace Dns.Api.Domain
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
+    using FluentValidation.AspNetCore;
     using Infrastructure;
     using Infrastructure.Responses;
     using Microsoft.AspNetCore.Http;
@@ -18,6 +19,8 @@ namespace Dns.Api.Domain
     using Microsoft.EntityFrameworkCore;
     using Newtonsoft.Json.Converters;
     using Projections.Api;
+    using Projections.Api.DomainDetail;
+    using Projections.Api.ServiceDetail;
     using Query;
     using Requests;
     using Responses;
@@ -134,14 +137,20 @@ namespace Dns.Api.Domain
             [FromRoute] string topLevelDomain,
             CancellationToken cancellationToken = default)
         {
-            // TODO: Test if people can send in wrong second/toplevel domains and if we can use a validator on it?
+            var request = new DetailDomainRequest
+            {
+                SecondLevelDomain = secondLevelDomain,
+                TopLevelDomain = topLevelDomain,
+            };
 
-            var domain = await context
-                .DomainDetails
-                .FindAsync(new object[] { $"{secondLevelDomain}.{topLevelDomain}" }, cancellationToken);
+            var validator = new DetailDomainRequestValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
-            if (domain == null)
-                throw new ApiException(DomainNotFoundResponseExamples.Message, StatusCodes.Status404NotFound);
+            validationResult.AddToModelState(ModelState, "request");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var domain = await FindDomainAsync(context, secondLevelDomain, topLevelDomain, cancellationToken);
 
             return Ok(
                 new DomainDetailResponse(domain));
@@ -171,14 +180,20 @@ namespace Dns.Api.Domain
             [FromRoute] string topLevelDomain,
             CancellationToken cancellationToken = default)
         {
-            // TODO: Test if people can send in wrong second/toplevel domains and if we can use a validator on it?
+            var request = new ListServicesRequest
+            {
+                SecondLevelDomain = secondLevelDomain,
+                TopLevelDomain = topLevelDomain,
+            };
 
-            var domain = await context
-                .DomainDetails
-                .FindAsync(new object[] { $"{secondLevelDomain}.{topLevelDomain}" }, cancellationToken);
+            var validator = new ListServicesRequestValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
-            if (domain == null)
-                throw new ApiException(DomainNotFoundResponseExamples.Message, StatusCodes.Status404NotFound);
+            validationResult.AddToModelState(ModelState, "request");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var domain = await FindDomainAsync(context, secondLevelDomain, topLevelDomain, cancellationToken);
 
             return Ok(
                 new DomainServiceListResponse(domain)
@@ -209,12 +224,113 @@ namespace Dns.Api.Domain
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(DomainServiceResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(ServiceNotFoundResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
-        public async Task<IActionResult> GetService(
+        public async Task<IActionResult> DetailService(
             [FromServices] ApiProjectionsContext context,
             [FromRoute] string secondLevelDomain,
             [FromRoute] string topLevelDomain,
             [FromRoute] Guid serviceId,
             CancellationToken cancellationToken = default)
+        {
+            var request = new DetailServiceRequest
+            {
+                SecondLevelDomain = secondLevelDomain,
+                TopLevelDomain = topLevelDomain,
+            };
+
+            var validator = new DetailServiceRequestValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+            validationResult.AddToModelState(ModelState, "request");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var service = await FindServiceAsync(context, serviceId, cancellationToken);
+
+            await FindDomainAsync(context, secondLevelDomain, topLevelDomain, cancellationToken);
+
+            return Ok(
+                new DomainServiceDetailResponse(service));
+        }
+
+        /// <summary>
+        /// Remove a domain service.
+        /// </summary>
+        /// <param name="bus"></param>
+        /// <param name="context"></param>
+        /// <param name="commandId">Optional unique identifier for the request.</param>
+        /// <param name="secondLevelDomain">Second level domain of the domain to remove the domain service from.</param>
+        /// <param name="topLevelDomain">Top level domain of the domain to remove the domain service from.</param>
+        /// <param name="serviceId">Unique service id to remove.</param>
+        /// <param name="cancellationToken"></param>
+        /// <response code="202">If the request has been accepted.</response>
+        /// <response code="404">If the domain or domain service does not exist.</response>
+        /// <response code="500">If an internal error has occurred.</response>
+        /// <returns></returns>
+        [HttpDelete("{secondLevelDomain}.{topLevelDomain}/services/{serviceId}")]
+        [ProducesResponseType(typeof(void), StatusCodes.Status202Accepted)]
+        [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
+        [SwaggerResponseExample(StatusCodes.Status202Accepted, typeof(EmptyResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(ServiceNotFoundResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        public async Task<IActionResult> DeleteService(
+            [FromServices] ICommandHandlerResolver bus,
+            [FromServices] ApiProjectionsContext context,
+            [FromCommandId] Guid commandId,
+            [FromRoute] string secondLevelDomain,
+            [FromRoute] string topLevelDomain,
+            [FromRoute] Guid serviceId,
+            CancellationToken cancellationToken = default)
+        {
+            var request = new RemoveServiceRequest
+            {
+                SecondLevelDomain = secondLevelDomain,
+                TopLevelDomain = topLevelDomain,
+                ServiceId = serviceId
+            };
+
+            var validator = new RemoveServiceRequestValidator();
+            var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+            validationResult.AddToModelState(ModelState, "request");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            await FindServiceAsync(context, serviceId, cancellationToken);
+
+            await FindDomainAsync(context, secondLevelDomain, topLevelDomain, cancellationToken);
+
+            var command = RemoveServiceRequestMapping.Map(request);
+
+            return Accepted(
+                $"/v1/domains/{command.DomainName}/services",
+                await bus.Dispatch(
+                    commandId,
+                    command,
+                    GetMetadata(),
+                    cancellationToken));
+        }
+
+        private static async Task<DomainDetail> FindDomainAsync(
+            ApiProjectionsContext context,
+            string secondLevelDomain,
+            string topLevelDomain,
+            CancellationToken cancellationToken)
+        {
+            var domain = await context
+                .DomainDetails
+                .FindAsync(new object[] { $"{secondLevelDomain}.{topLevelDomain}" }, cancellationToken);
+
+            if (domain == null)
+                throw new ApiException(DomainNotFoundResponseExamples.Message, StatusCodes.Status404NotFound);
+
+            return domain;
+        }
+
+        private static async Task<ServiceDetail> FindServiceAsync(
+            ApiProjectionsContext context,
+            Guid serviceId,
+            CancellationToken cancellationToken)
         {
             var service = await context
                 .ServiceDetails
@@ -223,8 +339,7 @@ namespace Dns.Api.Domain
             if (service == null)
                 throw new ApiException(ServiceNotFoundResponseExamples.Message, StatusCodes.Status404NotFound);
 
-            return Ok(
-                new DomainServiceDetailResponse(service));
+            return service;
         }
     }
 }
