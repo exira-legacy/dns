@@ -3,6 +3,7 @@ namespace Dns.Api.Domain.Responses
     using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
+    using Projections.Api.DomainDetail;
     using Swashbuckle.AspNetCore.Filters;
 
     [DataContract(Name = "DomainServices", Namespace = "")]
@@ -22,7 +23,7 @@ namespace Dns.Api.Domain.Responses
         /// Id of the domain service.
         /// </summary>
         [DataMember(Name = "Id", Order = 1)]
-        public ServiceId Id { get; set; }
+        public Guid ServiceId { get; set; }
 
         /// <summary>
         /// Type of the domain service.
@@ -31,19 +32,17 @@ namespace Dns.Api.Domain.Responses
         public string Type { get; set; }
 
         /// <summary>
-        /// Name of the domain service.
+        /// Descriptive label of the domain service.
         /// </summary>
-        [DataMember(Name = "Name", Order = 3)]
-        public string Name { get; set; }
+        [DataMember(Name = "Label", Order = 3)]
+        public string Label { get; set; }
 
         public DomainServiceListItemResponse(
-            ServiceId id,
-            string type,
-            string name)
+            DomainDetail.DomainDetailService domainDetailService)
         {
-            Id = id;
-            Type = type;
-            Name = name;
+            ServiceId = domainDetailService.ServiceId;
+            Type = domainDetailService.Type;
+            Label = domainDetailService.Label;
         }
     }
 
@@ -54,8 +53,17 @@ namespace Dns.Api.Domain.Responses
             {
                 Services = new List<DomainServiceListItemResponse>
                 {
-                    new DomainServiceListItemResponse(new ServiceId(Guid.NewGuid()), ServiceType.manual.Value, "My Mail Services"),
-                    new DomainServiceListItemResponse(new ServiceId(Guid.NewGuid()), ServiceType.googlesuite.Value, ServiceType.googlesuite.DisplayName)
+                    new DomainServiceListItemResponse(
+                        new DomainDetail.DomainDetailService(
+                            Guid.NewGuid(),
+                            ServiceType.manual.Value,
+                            "My Mail Services")),
+
+                    new DomainServiceListItemResponse(
+                        new DomainDetail.DomainDetailService(
+                            Guid.NewGuid(),
+                            ServiceType.googlesuite.Value,
+                            ServiceType.googlesuite.DisplayName))
                 }
             };
     }

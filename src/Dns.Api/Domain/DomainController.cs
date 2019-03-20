@@ -171,10 +171,23 @@ namespace Dns.Api.Domain
             [FromRoute] string topLevelDomain,
             CancellationToken cancellationToken = default)
         {
-            // TODO: Implement getting from context
+            // TODO: Test if people can send in wrong second/toplevel domains and if we can use a validator on it?
+
+            var domain = await context
+                .DomainDetails
+                .FindAsync(new object[] { $"{secondLevelDomain}.{topLevelDomain}" }, cancellationToken);
+
+            if (domain == null)
+                throw new ApiException(DomainNotFoundResponseExamples.Message, StatusCodes.Status404NotFound);
 
             return Ok(
-                new DomainServiceListResponse());
+                new DomainServiceListResponse
+                {
+                    Services = domain
+                        .Services
+                        .Select(x => new DomainServiceListItemResponse(x))
+                        .ToList()
+                });
         }
 
         /// <summary>
