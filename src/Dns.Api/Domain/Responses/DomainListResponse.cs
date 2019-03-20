@@ -3,7 +3,9 @@ namespace Dns.Api.Domain.Responses
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Net;
     using System.Runtime.Serialization;
+    using Infrastructure;
     using Projections.Api.DomainList;
     using Swashbuckle.AspNetCore.Filters;
 
@@ -15,6 +17,20 @@ namespace Dns.Api.Domain.Responses
         /// </summary>
         [DataMember(Name = "Domains", Order = 1)]
         public List<DomainListItemResponse> Domains { get; set; }
+
+        /// <summary>
+        /// Hypermedia links
+        /// </summary>
+        [DataMember(Name = "Links", Order = 2)]
+        public List<Link> Links { get; set; }
+
+        public DomainListResponse()
+        {
+            Links = new List<Link>
+            {
+                new Link("/", Link.Relations.Home, WebRequestMethods.Http.Get),
+            };
+        }
     }
 
     [DataContract(Name = "Domain", Namespace = "")]
@@ -32,6 +48,12 @@ namespace Dns.Api.Domain.Responses
         [DataMember(Name = "Services", Order = 2)]
         public List<DomainListItemServiceResponse> Services { get; set; }
 
+        /// <summary>
+        /// Hypermedia links
+        /// </summary>
+        [DataMember(Name = "Links", Order = 3)]
+        public List<Link> Links { get; set; }
+
         public DomainListItemResponse(
             DomainList domainList)
         {
@@ -39,8 +61,14 @@ namespace Dns.Api.Domain.Responses
 
             Services = domainList
                 .Services
-                .Select(x => new DomainListItemServiceResponse(x.ServiceId, x.Type, x.Label))
+                .Select(x => new DomainListItemServiceResponse(domainList.Name, x.ServiceId, x.Type, x.Label))
                 .ToList();
+
+            Links = new List<Link>
+            {
+                new Link($"/domains/{domainList.Name}", Link.Relations.Domain, WebRequestMethods.Http.Get),
+                new Link($"/domains/{domainList.Name}/services", Link.Relations.Services, WebRequestMethods.Http.Get)
+            };
         }
     }
 
@@ -65,7 +93,14 @@ namespace Dns.Api.Domain.Responses
         [DataMember(Name = "Label", Order = 3)]
         public string Label { get; set; }
 
+        /// <summary>
+        /// Hypermedia links
+        /// </summary>
+        [DataMember(Name = "Links", Order = 4)]
+        public List<Link> Links { get; set; }
+
         public DomainListItemServiceResponse(
+            string domainName,
             Guid serviceId,
             string type,
             string label)
@@ -73,6 +108,11 @@ namespace Dns.Api.Domain.Responses
             ServiceId = serviceId;
             Type = type;
             Label = label;
+
+            Links = new List<Link>
+            {
+                new Link($"/domains/{domainName}/services/{serviceId}", Link.Relations.Service, WebRequestMethods.Http.Get)
+            };
         }
     }
 

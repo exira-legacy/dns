@@ -25,7 +25,8 @@ namespace Dns.Projections.Api.ServiceDetail
                             Label = message.Message.ServiceLabel,
                             ServiceData = new GoogleSuiteService(
                                 new ServiceId(message.Message.ServiceId),
-                                new GoogleVerificationToken(message.Message.VerificationToken)).GetServiceData()
+                                new GoogleVerificationToken(message.Message.VerificationToken)).GetServiceData(),
+                            Domain = message.Message.DomainName
                         }, ct);
             });
 
@@ -47,7 +48,8 @@ namespace Dns.Projections.Api.ServiceDetail
                                         RecordType.FromValue(r.Type),
                                         new TimeToLive(r.TimeToLive),
                                         new RecordLabel(r.Label),
-                                        new RecordValue(r.Value))).ToList())).GetServiceData()
+                                        new RecordValue(r.Value))).ToList())).GetServiceData(),
+                            Domain = message.Message.DomainName
                         }, ct);
             });
 

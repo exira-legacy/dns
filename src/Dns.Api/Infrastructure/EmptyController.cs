@@ -20,4 +20,6 @@ namespace Dns.Api.Infrastructure
                 ? (IActionResult)new RedirectResult("/docs")
                 : new OkObjectResult($"Welcome to the Dns Api v{Assembly.GetEntryAssembly().GetName().Version}.");
     }
+
+    
 }

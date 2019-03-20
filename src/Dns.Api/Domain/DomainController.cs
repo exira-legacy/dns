@@ -180,11 +180,11 @@ namespace Dns.Api.Domain
                 throw new ApiException(DomainNotFoundResponseExamples.Message, StatusCodes.Status404NotFound);
 
             return Ok(
-                new DomainServiceListResponse
+                new DomainServiceListResponse(domain)
                 {
                     Services = domain
                         .Services
-                        .Select(x => new DomainServiceListItemResponse(x))
+                        .Select(x => new DomainServiceListItemResponse(domain, x))
                         .ToList()
                 });
         }

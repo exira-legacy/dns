@@ -1,7 +1,10 @@
 namespace Dns.Api.Domain.Responses
 {
     using System;
+    using System.Collections.Generic;
+    using System.Net;
     using System.Runtime.Serialization;
+    using Infrastructure;
     using Projections.Api.ServiceDetail;
     using Swashbuckle.AspNetCore.Filters;
 
@@ -32,6 +35,12 @@ namespace Dns.Api.Domain.Responses
         [DataMember(Name = "Data", Order = 3)]
         public string Data { get; set; }
 
+        /// <summary>
+        /// Hypermedia links
+        /// </summary>
+        [DataMember(Name = "Links", Order = 4)]
+        public List<Link> Links { get; set; }
+
         public DomainServiceDetailResponse(
             ServiceDetail service)
         {
@@ -39,6 +48,14 @@ namespace Dns.Api.Domain.Responses
             Type = service.Type;
             Label = service.Label;
             Data = service.ServiceData;
+
+            Links = new List<Link>
+            {
+                new Link("/", Link.Relations.Home, WebRequestMethods.Http.Get),
+                new Link("/domains", Link.Relations.Domains, WebRequestMethods.Http.Get),
+                new Link($"/domains/{service.Domain}", Link.Relations.Domain, WebRequestMethods.Http.Get),
+                new Link($"/domains/{service.Domain}/services", Link.Relations.Services, WebRequestMethods.Http.Get),
+            };
         }
     }
 

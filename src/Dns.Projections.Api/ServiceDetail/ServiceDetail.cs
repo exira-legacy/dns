@@ -8,6 +8,8 @@ namespace Dns.Projections.Api.ServiceDetail
 
     public class ServiceDetail
     {
+        public string Domain { get; set; }
+
         public Guid ServiceId { get; set; }
 
         public string Type { get; set; }
@@ -34,6 +36,9 @@ namespace Dns.Projections.Api.ServiceDetail
                 .HasMaxLength(ServiceLabel.MaxLength);
 
             b.Property(x => x.ServiceData);
+
+            b.Property(x => x.Domain)
+                .HasMaxLength(SecondLevelDomain.MaxLength + (TopLevelDomain.GetAll().Max(x => x.Value.Length) * 2));
         }
     }
 }
