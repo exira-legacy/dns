@@ -56,7 +56,7 @@ namespace Dns.Projector.Infrastructure.Modules
 
                 .RegisterEventstreamModule(_configuration)
 
-                .RegisterModule(new ProjectorModule(_loggerFactory));
+                .RegisterModule<ProjectorModule>();
 
             RegisterApiProjections(builder);
         }

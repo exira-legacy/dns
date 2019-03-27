@@ -11,7 +11,6 @@ namespace Dns.Api.Domain
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
-    using Exceptions;
     using Infrastructure;
     using Infrastructure.Responses;
     using Microsoft.AspNetCore.Http;
