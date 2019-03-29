@@ -49,10 +49,12 @@ namespace Dns.Api.Infrastructure
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services
-                .AddLocalization(opts => opts.ResourcesPath = "Resources")
+                .AddLocalization(opts => opts.ResourcesPath = "Resources")  // TODO: This can go in ConfigureDefaultForApi
 
-                .Configure<RequestLocalizationOptions>(opts =>
+                .Configure<RequestLocalizationOptions>(opts =>  // TODO: This can partly go in ConfigureDefaultForApi, just pass in defaultRequestCulture and supportedCultures
                 {
+                    var defaultRequestCulture = new RequestCulture("en-GB");
+
                     var supportedCultures = new List<CultureInfo>
                     {
                         new CultureInfo("en-GB"),
@@ -62,11 +64,12 @@ namespace Dns.Api.Infrastructure
                         new CultureInfo("fr"),
                     };
 
-                    opts.DefaultRequestCulture = new RequestCulture("en-GB");
-                    // Formatting numbers, dates, etc.
+                    opts.DefaultRequestCulture = defaultRequestCulture;
                     opts.SupportedCultures = supportedCultures;
-                    // UI strings that we have localized.
                     opts.SupportedUICultures = supportedCultures;
+
+                    opts.FallBackToParentCultures = true;
+                    opts.FallBackToParentUICultures = true;
                 })
 
                 .ConfigureDefaultForApi<Startup>(
@@ -121,7 +124,7 @@ namespace Dns.Api.Infrastructure
             }
 
             app
-                .UseRequestLocalization(requestLocalizationOptions.Value)
+                .UseRequestLocalization(requestLocalizationOptions.Value) // TODO: This can go in UseDefaultForApi
 
                 .UseDefaultForApi(new StartupOptions
                 {
@@ -157,7 +160,7 @@ namespace Dns.Api.Infrastructure
                     },
                 });
 
-            GlobalStringLocalizer.Instance = sharedStringLocalizer;
+            GlobalStringLocalizer.Instance = sharedStringLocalizer; // TODO: This can go in UseDefaultForApi
         }
 
         private static string GetApiLeadingText(ApiVersionDescription description)
@@ -169,7 +172,7 @@ namespace Dns.Api
 {
     using Microsoft.Extensions.Localization;
 
-    public class GlobalStringLocalizer
+    public class GlobalStringLocalizer  // TODO: This can go in UseDefaultForApi
     {
         public static IStringLocalizer<SharedResources> Instance;
     }
