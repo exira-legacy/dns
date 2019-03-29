@@ -4,5 +4,9 @@ Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac
 
 FluentValidation.AspNetCore
 
+Microsoft.AspNetCore.Localization
+Microsoft.Extensions.Localization
+LocalizationProvider.AspNetCore
+
 SourceLink.Embed.AllSourceFiles
 SourceLink.Copy.PdbFiles

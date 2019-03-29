@@ -1,6 +1,8 @@
 namespace Dns.Api.Infrastructure
 {
     using System;
+    using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Reflection;
     using Be.Vlaanderen.Basisregisters.Api;
@@ -15,10 +17,13 @@ namespace Dns.Api.Infrastructure
     using Exceptions;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Localization;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Localization;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
     using Modules;
     using SqlStreamStore;
     using Swashbuckle.AspNetCore.Swagger;
@@ -44,6 +49,26 @@ namespace Dns.Api.Infrastructure
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services
+                .AddLocalization(opts => opts.ResourcesPath = "Resources")
+
+                .Configure<RequestLocalizationOptions>(opts =>
+                {
+                    var supportedCultures = new List<CultureInfo>
+                    {
+                        new CultureInfo("en-GB"),
+                        new CultureInfo("en-US"),
+                        new CultureInfo("en"),
+                        new CultureInfo("fr-FR"),
+                        new CultureInfo("fr"),
+                    };
+
+                    opts.DefaultRequestCulture = new RequestCulture("en-GB");
+                    // Formatting numbers, dates, etc.
+                    opts.SupportedCultures = supportedCultures;
+                    // UI strings that we have localized.
+                    opts.SupportedUICultures = supportedCultures;
+                })
+
                 .ConfigureDefaultForApi<Startup>(
                     (provider, description) => new Info
                     {
@@ -59,7 +84,8 @@ namespace Dns.Api.Infrastructure
                     },
                     new [] { typeof(Startup).GetTypeInfo().Assembly.GetName().Name, },
                     corsHeaders: _configuration.GetSection("Cors").GetChildren().Select(c => c.Value).ToArray(),
-                    configureFluentValidation: fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
+                    configureFluentValidation: fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>(),
+                    configureMvcBuilder: builder => builder.AddDataAnnotationsLocalization());
 
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterModule(new ApiModule(_configuration, services, _loggerFactory));
@@ -77,9 +103,11 @@ namespace Dns.Api.Infrastructure
             IApiVersionDescriptionProvider apiVersionProvider,
             ApiDataDogToggle datadogToggle,
             ApiDebugDataDogToggle debugDataDogToggle,
-            MsSqlStreamStore streamStore)
+            MsSqlStreamStore streamStore,
+            IOptions<RequestLocalizationOptions> requestLocalizationOptions,
+            IStringLocalizer<SharedResources> sharedStringLocalizer)
         {
-            StartupHelpers.EnsureSqlStreamStoreSchema<Startup>(streamStore, loggerFactory);
+            //StartupHelpers.EnsureSqlStreamStoreSchema<Startup>(streamStore, loggerFactory);
 
             if (datadogToggle.FeatureEnabled)
             {
@@ -92,42 +120,59 @@ namespace Dns.Api.Infrastructure
                     pathToCheck => pathToCheck != "/");
             }
 
-            app.UseDefaultForApi(new StartupOptions
-            {
-                ApplicationContainer = _applicationContainer,
-                ServiceProvider = serviceProvider,
-                HostingEnvironment = env,
-                ApplicationLifetime = appLifetime,
-                LoggerFactory = loggerFactory,
-                Api =
+            app
+                .UseRequestLocalization(requestLocalizationOptions.Value)
+
+                .UseDefaultForApi(new StartupOptions
                 {
-                    VersionProvider = apiVersionProvider,
-                    Info = groupName => $"exira.com - Dns API {groupName}",
-                    CustomExceptionHandlers = new IExceptionHandler[]
+                    ApplicationContainer = _applicationContainer,
+                    ServiceProvider = serviceProvider,
+                    HostingEnvironment = env,
+                    ApplicationLifetime = appLifetime,
+                    LoggerFactory = loggerFactory,
+                    Api =
                     {
-                        new DomainExceptionHandler(),
-                        new Exceptions.ApiExceptionHandler(),
-                        new AggregateNotFoundExceptionHandling(),
-                        new WrongExpectedVersionExceptionHandling(),
-                        new InvalidTopLevelDomainExceptionHandling(),
-                        new InvalidRecordTypeExceptionHandling(),
-                        new InvalidServiceTypeExceptionHandling(),
-                        new ValidationExceptionHandling(),
-                    }
-                },
-                Server =
-                {
-                    PoweredByName = "exira.com - exira.com",
-                    ServerName = "exira.com"
-                },
-                MiddlewareHooks =
-                {
-                    AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>(),
-                },
-            });
+                        VersionProvider = apiVersionProvider,
+                        Info = groupName => $"exira.com - Dns API {groupName}",
+                        CustomExceptionHandlers = new IExceptionHandler[]
+                        {
+                            new DomainExceptionHandler(),
+                            new Exceptions.ApiExceptionHandler(),
+                            new AggregateNotFoundExceptionHandling(),
+                            new WrongExpectedVersionExceptionHandling(),
+                            new InvalidTopLevelDomainExceptionHandling(),
+                            new InvalidRecordTypeExceptionHandling(),
+                            new InvalidServiceTypeExceptionHandling(),
+                            new ValidationExceptionHandling(),
+                        }
+                    },
+                    Server =
+                    {
+                        PoweredByName = "exira.com - exira.com",
+                        ServerName = "exira.com"
+                    },
+                    MiddlewareHooks =
+                    {
+                        AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>(),
+                    },
+                });
+
+            GlobalStringLocalizer.Instance = sharedStringLocalizer;
         }
 
         private static string GetApiLeadingText(ApiVersionDescription description)
             => $"Right now you are reading the documentation for version {description.ApiVersion} of the exira.com Dns API{string.Format(description.IsDeprecated ? ", **this API version is not supported any more**." : ".")}";
     }
+}
+
+namespace Dns.Api
+{
+    using Microsoft.Extensions.Localization;
+
+    public class GlobalStringLocalizer
+    {
+        public static IStringLocalizer<SharedResources> Instance;
+    }
+
+    public class SharedResources {}
 }

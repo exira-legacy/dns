@@ -27,6 +27,10 @@ nuget MySqlConnector 0.51.1
 
 nuget FluentValidation.AspNetCore 8.2.0
 
+nuget Microsoft.AspNetCore.Localization 2.2.0
+nuget Microsoft.Extensions.Localization 2.2.0
+nuget LocalizationProvider.AspNetCore 5.4.1
+
 nuget Microsoft.EntityFrameworkCore.Design 2.2.3
 
 // BASE REGISTRIES STUFF
