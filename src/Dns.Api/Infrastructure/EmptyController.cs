@@ -3,7 +3,7 @@ namespace Dns.Api.Infrastructure
     using System.Reflection;
     using System.Threading;
     using Be.Vlaanderen.Basisregisters.Api;
-    using Localization;
+    using Be.Vlaanderen.Basisregisters.Api.Localization;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Localization;

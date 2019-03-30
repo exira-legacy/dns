@@ -1,7 +1,6 @@
 namespace Dns.Api.Infrastructure
 {
     using System;
-    using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
@@ -13,19 +12,14 @@ namespace Dns.Api.Infrastructure
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.AspNetCore;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Configuration;
-    using Domain;
     using Domain.Exceptions;
     using Exceptions;
-    using Localization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Localization;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Localization;
     using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Options;
     using Modules;
     using SqlStreamStore;
     using Swashbuckle.AspNetCore.Swagger;
@@ -50,49 +44,49 @@ namespace Dns.Api.Infrastructure
         /// <param name="services">The collection of services to configure the application with.</param>
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            const string defaultCulture = "en-GB";
+            var supportedCultures = $"{defaultCulture};en-US;en;fr-FR;fr";
+
             services
-                .AddLocalization(opts => opts.ResourcesPath = "Resources") // TODO: This can go in ConfigureDefaultForApi
-                .AddSingleton<IStringLocalizerFactory, SharedStringLocalizerFactory>() // TODO: This can go in ConfigureDefaultForApi
-                .AddSingleton<ResourceManagerStringLocalizerFactory, ResourceManagerStringLocalizerFactory>() // TODO: This can go in ConfigureDefaultForApi
-
-                .Configure<RequestLocalizationOptions>(opts =>  // TODO: This can partly go in ConfigureDefaultForApi, just pass in defaultRequestCulture and supportedCultures
+                .ConfigureDefaultForApi<Startup, SharedResources>(new StartupConfigureOptions
                 {
-                    var defaultRequestCulture = new RequestCulture("en-GB");
-
-                    var supportedCultures = new List<CultureInfo>
+                    Cors =
                     {
-                        new CultureInfo("en-GB"),
-                        new CultureInfo("en-US"),
-                        new CultureInfo("en"),
-                        new CultureInfo("fr-FR"),
-                        new CultureInfo("fr"),
-                    };
-
-                    opts.DefaultRequestCulture = defaultRequestCulture;
-                    opts.SupportedCultures = supportedCultures;
-                    opts.SupportedUICultures = supportedCultures;
-
-                    opts.FallBackToParentCultures = true;
-                    opts.FallBackToParentUICultures = true;
-                })
-
-                .ConfigureDefaultForApi<Startup>(
-                    (provider, description) => new Info
-                    {
-                        Version = description.ApiVersion.ToString(),
-                        Title = "Dns API",
-                        Description = GetApiLeadingText(description),
-                        Contact = new Contact
-                        {
-                            Name = "exira.com",
-                            Email = "info@exira.com",
-                            Url = "https://exira.com"
-                        }
+                        Headers = _configuration
+                            .GetSection("Cors")
+                            .GetChildren()
+                            .Select(c => c.Value)
+                            .ToArray()
                     },
-                    new [] { typeof(Startup).GetTypeInfo().Assembly.GetName().Name, },
-                    corsHeaders: _configuration.GetSection("Cors").GetChildren().Select(c => c.Value).ToArray(),
-                    configureFluentValidation: fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>(),
-                    configureMvcBuilder: builder => builder.AddDataAnnotationsLocalization());
+                    Swagger =
+                    {
+                        ApiInfo = (provider, description) => new Info
+                        {
+                            Version = description.ApiVersion.ToString(),
+                            Title = "Dns API",
+                            Description = GetApiLeadingText(description),
+                            Contact = new Contact
+                            {
+                                Name = "exira.com",
+                                Email = "info@exira.com",
+                                Url = "https://exira.com"
+                            }
+                        },
+                        XmlCommentPaths = new [] { typeof(Startup).GetTypeInfo().Assembly.GetName().Name }
+                    },
+                    Localization =
+                    {
+                        DefaultCulture = new CultureInfo(defaultCulture),
+                        SupportedCultures = supportedCultures
+                            .Split(';', StringSplitOptions.RemoveEmptyEntries)
+                            .Select(x => new CultureInfo(x))
+                            .ToArray()
+                    },
+                    MiddlewareHooks =
+                    {
+                        FluentValidation = fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>()
+                    }
+                });
 
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterModule(new ApiModule(_configuration, services, _loggerFactory));
@@ -110,8 +104,7 @@ namespace Dns.Api.Infrastructure
             IApiVersionDescriptionProvider apiVersionProvider,
             ApiDataDogToggle datadogToggle,
             ApiDebugDataDogToggle debugDataDogToggle,
-            MsSqlStreamStore streamStore,
-            IOptions<RequestLocalizationOptions> requestLocalizationOptions)
+            MsSqlStreamStore streamStore)
         {
             //StartupHelpers.EnsureSqlStreamStoreSchema<Startup>(streamStore, loggerFactory);
 
@@ -127,15 +120,15 @@ namespace Dns.Api.Infrastructure
             }
 
             app
-                .UseRequestLocalization(requestLocalizationOptions.Value) // TODO: This can go in UseDefaultForApi
-
-                .UseDefaultForApi(new StartupOptions
+                .UseDefaultForApi(new StartupUseOptions
                 {
-                    ApplicationContainer = _applicationContainer,
-                    ServiceProvider = serviceProvider,
-                    HostingEnvironment = env,
-                    ApplicationLifetime = appLifetime,
-                    LoggerFactory = loggerFactory,
+                    Common = {
+                        ApplicationContainer = _applicationContainer,
+                        ServiceProvider = serviceProvider,
+                        HostingEnvironment = env,
+                        ApplicationLifetime = appLifetime,
+                        LoggerFactory = loggerFactory,
+                    },
                     Api =
                     {
                         VersionProvider = apiVersionProvider,
@@ -162,45 +155,9 @@ namespace Dns.Api.Infrastructure
                         AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>(),
                     },
                 });
-
-            GlobalStringLocalizer.Instance = new GlobalStringLocalizer(app.ApplicationServices.GetRequiredService<IServiceProvider>()); // TODO: This can go in UseDefaultForApi
         }
 
         private static string GetApiLeadingText(ApiVersionDescription description)
             => $"Right now you are reading the documentation for version {description.ApiVersion} of the exira.com Dns API{string.Format(description.IsDeprecated ? ", **this API version is not supported any more**." : ".")}";
     }
-}
-
-namespace Dns.Api
-{
-    using System;
-    using System.Collections.Generic;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Localization;
-
-    public class GlobalStringLocalizer  // TODO: This can go in UseDefaultForApi
-    {
-        private readonly object _lock = new object();
-        private readonly IServiceProvider _serviceProvider;
-        private readonly IDictionary<Type, IStringLocalizer> _localizers = new Dictionary<Type, IStringLocalizer>();
-
-        public static GlobalStringLocalizer Instance;
-
-        public GlobalStringLocalizer(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
-
-        public IStringLocalizer<T> GetLocalizer<T>()
-        {
-            var type = typeof(T);
-
-            lock (_lock)
-            {
-                if (!_localizers.ContainsKey(type))
-                    _localizers.Add(type, _serviceProvider.GetService<IStringLocalizer<T>>());
-            }
-
-            return (IStringLocalizer<T>) _localizers[type];
-        }
-    }
-
-    public class SharedResources { }
 }

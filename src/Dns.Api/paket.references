@@ -2,10 +2,5 @@ Be.Vlaanderen.Basisregisters.Api
 Be.Vlaanderen.Basisregisters.EventHandling.Autofac
 Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac
 
-FluentValidation.AspNetCore
-
-Microsoft.AspNetCore.Localization
-Microsoft.Extensions.Localization
-
 SourceLink.Embed.AllSourceFiles
 SourceLink.Copy.PdbFiles

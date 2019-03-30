@@ -2,8 +2,8 @@ namespace Dns.Api.Domain
 {
     using System;
     using System.Linq;
+    using Be.Vlaanderen.Basisregisters.Api.Localization;
     using FluentValidation;
-    using Infrastructure.Localization;
     using Microsoft.Extensions.Localization;
 
     public class DomainValidatorResources
