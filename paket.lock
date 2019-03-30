@@ -56,7 +56,7 @@ NUGET
       Be.Vlaanderen.Basisregisters.AggregateSource.Testing (3.0.1)
       Microsoft.Extensions.Logging (>= 2.2)
       xunit (>= 2.4.1)
-    Be.Vlaanderen.Basisregisters.Api (2.0.2)
+    Be.Vlaanderen.Basisregisters.Api (2.1)
       Autofac (>= 4.9.2)
       Autofac.Extensions.DependencyInjection (>= 4.4)
       Be.Vlaanderen.Basisregisters.AggregateSource (>= 3.0 < 4.0)
