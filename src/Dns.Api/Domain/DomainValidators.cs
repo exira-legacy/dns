@@ -3,28 +3,41 @@ namespace Dns.Api.Domain
     using System;
     using System.Linq;
     using FluentValidation;
+    using Infrastructure.Localization;
+    using Microsoft.Extensions.Localization;
+
+    public class DomainValidatorResources
+    {
+        public string RequiredMessage => "{PropertyName} is required.";
+        public string MaxLengthMessage => "{PropertyName} cannot be longer than {MaxLength} characters.";
+        public string ValidHostNameMessage => "{PropertyName} must be a valid hostname.";
+        public string ValidEnumerationMessage => "{{PropertyName}} must be one of {0}.";
+    }
 
     public static class DomainValidators
     {
+        private static readonly IStringLocalizer<DomainValidatorResources> Localizer =
+            GlobalStringLocalizer.Instance.GetLocalizer<DomainValidatorResources>();
+
         public static IRuleBuilderOptions<T, Guid?> Required<T>(this IRuleBuilder<T, Guid?> ruleBuilder)
             => ruleBuilder
                 .NotEmpty()
-                .WithMessage(GlobalStringLocalizer.Instance["{PropertyName} is required."]);
+                .WithMessage(Localizer.GetString(x => x.RequiredMessage));
 
         public static IRuleBuilderOptions<T, string> Required<T>(this IRuleBuilder<T, string> ruleBuilder)
             => ruleBuilder
                 .NotEmpty()
-                .WithMessage(GlobalStringLocalizer.Instance["{PropertyName} is required."]);
+                .WithMessage(Localizer.GetString(x => x.RequiredMessage));
 
         public static IRuleBuilderOptions<T, string> MaxLength<T>(this IRuleBuilder<T, string> ruleBuilder, int length)
             => ruleBuilder
                 .Length(0, length)
-                .WithMessage(GlobalStringLocalizer.Instance["{PropertyName} cannot be longer than {MaxLength} characters."]);
+                .WithMessage(Localizer.GetString(x => x.MaxLengthMessage));
 
         public static IRuleBuilderOptions<T, string> ValidHostName<T>(this IRuleBuilder<T, string> ruleBuilder)
             => ruleBuilder
                 .Must(property => Uri.CheckHostName(property) == UriHostNameType.Dns)
-                .WithMessage(GlobalStringLocalizer.Instance["{PropertyName} must be a valid hostname."]);
+                .WithMessage(Localizer.GetString(x => x.ValidHostNameMessage));
 
         public static IRuleBuilderOptions<T, string> ValidTopLevelDomain<T>(this IRuleBuilder<T, string> ruleBuilder)
             => ruleBuilder
@@ -35,8 +48,9 @@ namespace Dns.Api.Domain
             where TException : EnumerationException
             => ruleBuilder
                 .Must(property => Enumeration<TEnum, string, TException>.TryParse(property, out _))
-                .WithMessage(GlobalStringLocalizer.Instance[
-                    "{{PropertyName}} must be one of {0}.",
-                    string.Join(", ", Enumeration<TEnum, string, TException>.GetAll().Select(x => $"'{x.Value}'"))]);
+                .WithMessage(
+                    Localizer.GetString(x =>
+                        x.ValidEnumerationMessage,
+                        string.Join(", ", Enumeration<TEnum, string, TException>.GetAll().Select(x => $"'{x.Value}'"))));
     }
 }

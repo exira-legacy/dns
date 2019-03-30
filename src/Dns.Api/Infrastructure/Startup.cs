@@ -13,8 +13,10 @@ namespace Dns.Api.Infrastructure
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.AspNetCore;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Configuration;
+    using Domain;
     using Domain.Exceptions;
     using Exceptions;
+    using Localization;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Localization;
@@ -49,7 +51,9 @@ namespace Dns.Api.Infrastructure
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services
-                .AddLocalization(opts => opts.ResourcesPath = "Resources")  // TODO: This can go in ConfigureDefaultForApi
+                .AddLocalization(opts => opts.ResourcesPath = "Resources") // TODO: This can go in ConfigureDefaultForApi
+                .AddSingleton<IStringLocalizerFactory, SharedStringLocalizerFactory>() // TODO: This can go in ConfigureDefaultForApi
+                .AddSingleton<ResourceManagerStringLocalizerFactory, ResourceManagerStringLocalizerFactory>() // TODO: This can go in ConfigureDefaultForApi
 
                 .Configure<RequestLocalizationOptions>(opts =>  // TODO: This can partly go in ConfigureDefaultForApi, just pass in defaultRequestCulture and supportedCultures
                 {
@@ -107,8 +111,7 @@ namespace Dns.Api.Infrastructure
             ApiDataDogToggle datadogToggle,
             ApiDebugDataDogToggle debugDataDogToggle,
             MsSqlStreamStore streamStore,
-            IOptions<RequestLocalizationOptions> requestLocalizationOptions,
-            IStringLocalizer<SharedResources> sharedStringLocalizer)
+            IOptions<RequestLocalizationOptions> requestLocalizationOptions)
         {
             //StartupHelpers.EnsureSqlStreamStoreSchema<Startup>(streamStore, loggerFactory);
 
@@ -160,7 +163,7 @@ namespace Dns.Api.Infrastructure
                     },
                 });
 
-            GlobalStringLocalizer.Instance = sharedStringLocalizer; // TODO: This can go in UseDefaultForApi
+            GlobalStringLocalizer.Instance = new GlobalStringLocalizer(app.ApplicationServices.GetRequiredService<IServiceProvider>()); // TODO: This can go in UseDefaultForApi
         }
 
         private static string GetApiLeadingText(ApiVersionDescription description)
@@ -170,12 +173,34 @@ namespace Dns.Api.Infrastructure
 
 namespace Dns.Api
 {
+    using System;
+    using System.Collections.Generic;
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Localization;
 
     public class GlobalStringLocalizer  // TODO: This can go in UseDefaultForApi
     {
-        public static IStringLocalizer<SharedResources> Instance;
+        private readonly object _lock = new object();
+        private readonly IServiceProvider _serviceProvider;
+        private readonly IDictionary<Type, IStringLocalizer> _localizers = new Dictionary<Type, IStringLocalizer>();
+
+        public static GlobalStringLocalizer Instance;
+
+        public GlobalStringLocalizer(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
+
+        public IStringLocalizer<T> GetLocalizer<T>()
+        {
+            var type = typeof(T);
+
+            lock (_lock)
+            {
+                if (!_localizers.ContainsKey(type))
+                    _localizers.Add(type, _serviceProvider.GetService<IStringLocalizer<T>>());
+            }
+
+            return (IStringLocalizer<T>) _localizers[type];
+        }
     }
 
-    public class SharedResources {}
+    public class SharedResources { }
 }
