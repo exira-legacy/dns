@@ -7,6 +7,11 @@ namespace Dns.Api.Infrastructure.Localization
     {
         public static string GetString(
             this IStringLocalizer target,
+            Func<string> model)
+            => target.GetString(model());
+
+        public static string GetString(
+            this IStringLocalizer target,
             Func<string> model,
             params object[] formatArguments)
             => target.GetString(model(), formatArguments);
