@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:2.2.3-runtime-deps
+FROM microsoft/dotnet:2.2.4-runtime-deps
 
 LABEL maintainer "exira.com <info@exira.com>"
 

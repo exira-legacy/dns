@@ -1,9 +1,13 @@
 appsettings.*.json
+healthchecksdb
+
+structurizr-*.json
 tracing*.log
 
 .vs/
 .fake/
 .idea/
+wwwroot/
 
 [Pp]ackages/
 [Pp]aket-files/
@@ -14,6 +18,7 @@ tracing*.log
 [Oo]bj/
 [Xx]64/
 [Dd]ist/
+[Tt]est[Rr]esults/
 
 *.suo
 *.user
@@ -22,7 +27,6 @@ tracing*.log
 *.njsproj
 *.trx
 
-TestResults/
 node_modules/
 bower_components/
 debug.log

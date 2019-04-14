@@ -13,11 +13,11 @@ namespace Dns.Domain
     public sealed class DomainCommandHandlerModule : CommandHandlerModule
     {
         public DomainCommandHandlerModule(
-            Func<IDomains> getDomains,
-            Func<ConcurrentUnitOfWork> getUnitOfWork,
             Func<IStreamStore> getStreamStore,
+            Func<ConcurrentUnitOfWork> getUnitOfWork,
             EventMapping eventMapping,
-            EventSerializer eventSerializer)
+            EventSerializer eventSerializer,
+            Func<IDomains> getDomains)
         {
             For<CreateDomain>()
                 .AddSqlStreamStore(getStreamStore, getUnitOfWork, eventMapping, eventSerializer)

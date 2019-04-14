@@ -18,11 +18,11 @@ namespace Dns.Projections.Api
             ILoggerFactory loggerFactory)
         {
             var logger = loggerFactory.CreateLogger<ApiProjectionsModule>();
-            var connectionString = configuration.GetConnectionString("ApiProjections");
+            var projectionsConnectionString = configuration.GetConnectionString("ApiProjections");
 
-            var hasConnectionString = !string.IsNullOrWhiteSpace(connectionString);
+            var hasConnectionString = !string.IsNullOrWhiteSpace(projectionsConnectionString);
             if (hasConnectionString)
-                RunOnSqlServer(configuration, services, loggerFactory, connectionString);
+                RunOnSqlServer(configuration, services, loggerFactory, projectionsConnectionString);
             else
                 RunInMemoryDb(services, loggerFactory, logger);
 

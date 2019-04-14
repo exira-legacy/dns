@@ -18,6 +18,9 @@ nuget Microsoft.Extensions.Configuration.Json 2.2.0
 nuget Microsoft.Extensions.Http 2.2.0
 nuget Microsoft.Extensions.Http.Polly 2.2.0
 
+// For more healtchecks, look at https://github.com/Xabaril/AspNetCore.Diagnostics.HealthChecks
+nuget AspNetCore.HealthChecks.SqlServer 2.2.0
+
 nuget Autofac 4.9.2
 nuget Autofac.Extensions.DependencyInjection 4.4.0
 
@@ -38,7 +41,7 @@ nuget Be.Vlaanderen.Basisregisters.AggregateSource.Testing ~> 3.0
 nuget Be.Vlaanderen.Basisregisters.AggregateSource.Testing.SqlStreamStore.Autofac ~> 3.0
 nuget Be.Vlaanderen.Basisregisters.AggregateSource.Testing.Xunit ~> 3.0
 
-nuget Be.Vlaanderen.Basisregisters.Api ~> 2.1
+nuget Be.Vlaanderen.Basisregisters.Api ~> 2.3
 
 nuget Be.Vlaanderen.Basisregisters.CommandHandling ~> 3.0
 nuget Be.Vlaanderen.Basisregisters.CommandHandling.SqlStreamStore ~> 3.0
@@ -46,13 +49,13 @@ nuget Be.Vlaanderen.Basisregisters.CommandHandling.SqlStreamStore ~> 3.0
 nuget Be.Vlaanderen.Basisregisters.EventHandling ~> 1.0
 nuget Be.Vlaanderen.Basisregisters.EventHandling.Autofac ~> 1.0
 
+nuget Be.Vlaanderen.Basisregisters.Projector ~> 3.0
+
 nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore ~> 3.1
 nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac ~> 3.1
 nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner ~> 3.1
 nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector ~> 3.1
 nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector.Testing ~> 3.1
-
-nuget Be.Vlaanderen.Basisregisters.Projector ~> 3.0
 
 nuget Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac ~> 1.1
 nuget Be.Vlaanderen.Basisregisters.DataDog.Tracing.Sql ~> 1.1
@@ -66,6 +69,7 @@ nuget Structurizr.AdrTools 0.9.0
 // TEST STUFF
 nuget Microsoft.NET.Test.Sdk 16.0.1
 nuget Microsoft.AspNetCore.TestHost 2.2.0
+nuget Microsoft.EntityFrameworkCore.InMemory 2.2.4
 nuget xunit 2.4.1
 nuget xunit.runner.visualstudio 2.4.1
 nuget xunit.categories 2.0.4

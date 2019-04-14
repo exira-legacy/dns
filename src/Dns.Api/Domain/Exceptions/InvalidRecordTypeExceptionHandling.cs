@@ -7,8 +7,7 @@ namespace Dns.Api.Domain.Exceptions
     public class InvalidRecordTypeExceptionHandling : DefaultExceptionHandler<InvalidRecordTypeException>
     {
         protected override BasicApiProblem GetApiProblemFor(InvalidRecordTypeException exception)
-        {
-            return new BasicApiProblem
+            => new BasicApiProblem
             {
                 HttpStatus = (int)HttpStatusCode.BadRequest,
                 Title = Constants.DefaultTitle,
@@ -16,6 +15,5 @@ namespace Dns.Api.Domain.Exceptions
                 ProblemInstanceUri = BasicApiProblem.GetProblemNumber(),
                 ProblemTypeUri = BasicApiProblem.GetTypeUriFor(exception)
             };
-        }
     }
 }

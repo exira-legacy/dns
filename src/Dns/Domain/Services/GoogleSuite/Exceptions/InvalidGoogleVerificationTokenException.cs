@@ -7,6 +7,6 @@ namespace Dns.Domain.Services.GoogleSuite.Exceptions
 
     public class EmptyGoogleVerificationTokenException : InvalidGoogleVerificationTokenException
     {
-        public EmptyGoogleVerificationTokenException() : base("Token of a Google domain verification token cannot be empty.") {}
+        public EmptyGoogleVerificationTokenException() : base("Token of a Google domain verification token cannot be empty.") { }
     }
 }

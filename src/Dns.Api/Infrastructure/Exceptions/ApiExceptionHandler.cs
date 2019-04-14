@@ -5,8 +5,7 @@ namespace Dns.Api.Infrastructure.Exceptions
     public class ApiExceptionHandler : DefaultExceptionHandler<ApiException>
     {
         protected override BasicApiProblem GetApiProblemFor(ApiException exception)
-        {
-            return new BasicApiProblem
+            => new BasicApiProblem
             {
                 HttpStatus = exception.StatusCode,
                 Title = Constants.DefaultTitle,
@@ -14,6 +13,5 @@ namespace Dns.Api.Infrastructure.Exceptions
                 ProblemInstanceUri = BasicApiProblem.GetProblemNumber(),
                 ProblemTypeUri = BasicApiProblem.GetTypeUriFor(exception)
             };
-        }
     }
 }

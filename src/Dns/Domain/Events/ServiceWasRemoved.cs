@@ -35,6 +35,6 @@ namespace Dns.Domain.Events
                 new DomainName(
                     new SecondLevelDomain(secondLevelDomain),
                     Dns.TopLevelDomain.FromValue(topLevelDomain)),
-                new ServiceId(serviceId)) {}
+                new ServiceId(serviceId)) { }
     }
 }

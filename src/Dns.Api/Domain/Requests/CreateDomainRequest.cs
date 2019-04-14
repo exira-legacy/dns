@@ -36,23 +36,20 @@ namespace Dns.Api.Domain.Requests
     public class CreateDomainRequestExample : IExamplesProvider
     {
         public object GetExamples()
-        {
-            return new CreateDomainRequest
+            => new CreateDomainRequest
             {
                 SecondLevelDomain = "exira",
                 TopLevelDomain = TopLevelDomain.com.Value
             };
-        }
     }
 
     public static class CreateDomainRequestMapping
     {
-        public static CreateDomain Map(CreateDomainRequest message)
-        {
-            return new CreateDomain(
+        public static CreateDomain Map(
+            CreateDomainRequest message)
+            => new CreateDomain(
                 new DomainName(
                     new SecondLevelDomain(message.SecondLevelDomain),
                     TopLevelDomain.FromValue(message.TopLevelDomain)));
-        }
     }
 }

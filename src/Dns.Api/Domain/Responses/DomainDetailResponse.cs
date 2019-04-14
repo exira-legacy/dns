@@ -160,7 +160,7 @@ namespace Dns.Api.Domain.Responses
         }
     }
 
-    public class DomainResponseExamples : IExamplesProvider
+    public class DomainDetailResponseExamples : IExamplesProvider
     {
         private static readonly Random Random = new Random();
 

@@ -53,5 +53,19 @@ namespace Dns.Api.Tests
                         new SecondLevelDomain(request.SecondLevelDomain),
                         TopLevelDomain.FromValue(request.TopLevelDomain))));
         }
+
+        [Fact]
+        public async Task should_fail_on_invalid_data()
+        {
+            var request = new CreateDomainRequest
+            {
+                SecondLevelDomain = "ex ira",
+                TopLevelDomain = "com-gibberish"
+            };
+
+            var commands = await Post("/v1/domains", request);
+
+            Assert.True(commands.Count == 0);
+        }
     }
 }

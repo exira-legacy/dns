@@ -8,14 +8,14 @@ namespace Dns.Api.Infrastructure
     {
         protected IDictionary<string, object> GetMetadata()
         {
-            var ip = User.FindFirst(AddRemoteIpAddressMiddleware.UrnBasisregistersVlaanderenIp)?.Value;
-            var correlationId = User.FindFirst(AddCorrelationIdMiddleware.UrnBasisregistersVlaanderenCorrelationId)?.Value;
+            if (User == null)
+                return new Dictionary<string, object>();
 
-            return new Dictionary<string, object>
-            {
-                { "Ip", ip },
-                { "CorrelationId", correlationId }
-            };
+            return new CommandMetaData(
+                    User,
+                    AddRemoteIpAddressMiddleware.UrnBasisregistersVlaanderenIp,
+                    AddCorrelationIdMiddleware.UrnBasisregistersVlaanderenCorrelationId)
+                .ToDictionary();
         }
     }
 }

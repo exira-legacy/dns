@@ -1,6 +1,7 @@
 namespace Dns.Api.Tests.Infrastructure
 {
     using System;
+    using System.Globalization;
     using System.Linq;
     using System.Reflection;
     using Api.Infrastructure;
@@ -21,6 +22,9 @@ namespace Dns.Api.Tests.Infrastructure
 
     public class TestStartup
     {
+        private const string DefaultCulture = "en-GB";
+        private const string SupportedCultures = "en-GB;en-US;en;nl-BE;nl;fr-BE;fr";
+
         private IContainer _applicationContainer;
 
         private readonly IConfiguration _configuration;
@@ -34,11 +38,11 @@ namespace Dns.Api.Tests.Infrastructure
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services
-                .ConfigureDefaultForApi<Startup>(new StartupConfigureOptions
+                .ConfigureDefaultForApi<Startup, SharedResources>(new StartupConfigureOptions
                 {
                     Cors =
                     {
-                        Headers = _configuration
+                        Origins = _configuration
                             .GetSection("Cors")
                             .GetChildren()
                             .Select(c => c.Value)
@@ -59,6 +63,18 @@ namespace Dns.Api.Tests.Infrastructure
                             }
                         },
                         XmlCommentPaths = new [] { typeof(Startup).GetTypeInfo().Assembly.GetName().Name }
+                    },
+                    Localization =
+                    {
+                        DefaultCulture = new CultureInfo(DefaultCulture),
+                        SupportedCultures = SupportedCultures
+                            .Split(';', StringSplitOptions.RemoveEmptyEntries)
+                            .Select(x => new CultureInfo(x.Trim()))
+                            .ToArray()
+                    },
+                    MiddlewareHooks =
+                    {
+                        FluentValidation = fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>()
                     }
                 });
 
@@ -79,7 +95,8 @@ namespace Dns.Api.Tests.Infrastructure
         {
             app.UseDefaultForApi(new StartupUseOptions
             {
-                Common = {
+                Common =
+                {
                     ApplicationContainer = _applicationContainer,
                     ServiceProvider = serviceProvider,
                     HostingEnvironment = env,
@@ -97,6 +114,9 @@ namespace Dns.Api.Tests.Infrastructure
                         new AggregateNotFoundExceptionHandling(),
                         new WrongExpectedVersionExceptionHandling(),
                         new InvalidTopLevelDomainExceptionHandling(),
+                        new InvalidRecordTypeExceptionHandling(),
+                        new InvalidServiceTypeExceptionHandling(),
+                        new ValidationExceptionHandling(),
                     }
                 },
                 Server =

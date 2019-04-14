@@ -43,13 +43,12 @@ namespace Dns.Api.Domain.Requests
 
     public static class RemoveServiceRequestMapping
     {
-        public static RemoveService Map(RemoveServiceRequest message)
-        {
-            return new RemoveService(
+        public static RemoveService Map(
+            RemoveServiceRequest message)
+            => new RemoveService(
                 new DomainName(
                     new SecondLevelDomain(message.SecondLevelDomain),
                     TopLevelDomain.FromValue(message.TopLevelDomain)),
                 new ServiceId(message.ServiceId.Value));
-        }
     }
 }

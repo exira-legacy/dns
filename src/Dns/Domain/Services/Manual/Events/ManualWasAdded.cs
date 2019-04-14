@@ -57,7 +57,6 @@ namespace Dns.Domain.Services.Manual.Events
                     Dns.TopLevelDomain.FromValue(topLevelDomain)),
                 new ServiceId(serviceId),
                 new ManualLabel(serviceLabel),
-                new RecordSet(records.Select(r => r.ToRecord()).ToList()))
-        { }
+                new RecordSet(records.Select(r => r.ToRecord()).ToList())) { }
     }
 }

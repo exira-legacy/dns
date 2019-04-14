@@ -27,6 +27,6 @@ namespace Dns.Domain.Events
             : this(
                 new DomainName(
                     new SecondLevelDomain(secondLevelDomain),
-                    Dns.TopLevelDomain.FromValue(topLevelDomain))) {}
+                    Dns.TopLevelDomain.FromValue(topLevelDomain))) { }
     }
 }

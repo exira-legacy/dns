@@ -9,7 +9,7 @@ namespace Dns.Api.Domain.Query
     using Projections.Api;
     using Projections.Api.DomainList;
 
-    public class DomainListQuery : Query<DomainList, DomainFilter>
+    public class DomainListQuery : Query<DomainList, DomainListFilter>
     {
         private readonly ApiProjectionsContext _context;
 
@@ -17,7 +17,7 @@ namespace Dns.Api.Domain.Query
 
         public DomainListQuery(ApiProjectionsContext context) => _context = context;
 
-        protected override IQueryable<DomainList> Filter(FilteringHeader<DomainFilter> filtering)
+        protected override IQueryable<DomainList> Filter(FilteringHeader<DomainListFilter> filtering)
         {
             var domains = _context
                 .DomainList
@@ -48,7 +48,7 @@ namespace Dns.Api.Domain.Query
         }
     }
 
-    public class DomainFilter
+    public class DomainListFilter
     {
         public string SecondLevelDomain { get; set; }
         public string TopLevelDomain { get; set; }

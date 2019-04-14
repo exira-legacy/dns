@@ -71,6 +71,7 @@ Target "Publish_Solution" (fun _ ->
 
 Target "Pack_Solution" (fun _ ->
   [
+    "Dns.Api"
   ] |> List.iter pack)
 
 Target "Containerize_Api" (fun _ -> containerize "Dns.Api" "api")

@@ -1,0 +1,24 @@
+type file
+version 1.0.0
+
+id Be.Vlaanderen.Basisregisters.Dns.Api
+title Be.Vlaanderen.Basisregisters.Dns.Api
+
+authors exira.com
+owners exira.com <https://exira.com>
+copyright Copyright (c) exira.com
+requireLicenseAcceptance false
+projectUrl https://github.com/exira/dns
+iconUrl https://raw.githubusercontent.com/informatievlaanderen/build-pipeline/master/logo.png
+licenseUrl https://opensource.org/licenses/EUPL-1.2
+
+description Dns.
+
+files
+  Dns.Api.dll => lib\netcoreapp2.2
+  Dns.Api.pdb => lib\netcoreapp2.2
+  Dns.Api.xml => lib\netcoreapp2.2
+  Dns.Api.xml => content
+
+  Dns.dll => lib\netcoreapp2.2
+  Dns.pdb => lib\netcoreapp2.2

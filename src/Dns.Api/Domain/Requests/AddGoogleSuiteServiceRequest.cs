@@ -59,14 +59,12 @@ namespace Dns.Api.Domain.Requests
     public class AddGoogleSuiteServiceRequestExample : IExamplesProvider
     {
         public object GetExamples()
-        {
-            return new AddGoogleSuiteServiceRequest
+            => new AddGoogleSuiteServiceRequest
             {
                 ServiceId = Guid.NewGuid(),
                 Label = ServiceType.googlesuite.DisplayName,
                 VerificationToken = "rXOxyZounnZasA8Z7oaD3c14JdjS9aKSWvsR1EbUSIQ"
             };
-        }
     }
 
     public static class AddGoogleSuiteServiceRequestMapping
@@ -74,11 +72,9 @@ namespace Dns.Api.Domain.Requests
         public static AddGoogleSuite Map(
             DomainName domainName,
             AddGoogleSuiteServiceRequest message)
-        {
-            return new AddGoogleSuite(
+            => new AddGoogleSuite(
                 domainName,
                 new ServiceId(message.ServiceId.Value),
                 new GoogleVerificationToken(message.VerificationToken));
-        }
     }
 }

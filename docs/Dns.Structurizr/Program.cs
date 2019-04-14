@@ -71,7 +71,7 @@ namespace Dns.Structurizr
 
             var user = CreatePersonUser(model);
 
-            var dns= CreateSystemDns(model);
+            var dns = CreateSystemDns(model);
 
             var api = CreateContainerApi(dns);
             var apiRunner = CreateContainerApiRunner(dns);
@@ -119,7 +119,7 @@ namespace Dns.Structurizr
 
         private static SoftwareSystem CreateSystemDns(Model model)
         {
-            var dns= model
+            var dns = model
                 .AddSoftwareSystem(
                     Location.Internal,
                     "Dns",
@@ -187,7 +187,7 @@ namespace Dns.Structurizr
 
         private static void CreateApiFake(Model model)
         {
-            var dns= model.GetSoftwareSystemWithId(SoftwareSystemDnsId);
+            var dns = model.GetSoftwareSystemWithId(SoftwareSystemDnsId);
 
             var apiStore = dns.GetContainerWithId(ContainerApiStoreId);
             var eventStore = dns.GetContainerWithId(ContainerEventStoreId);
@@ -211,7 +211,7 @@ namespace Dns.Structurizr
 
         //private static void CreateApiRunnerFake(Model model)
         //{
-        //    var dns= model.GetSoftwareSystemWithId(SoftwareSystemDnsId);
+        //    var dns = model.GetSoftwareSystemWithId(SoftwareSystemDnsId);
 
         //    var apiStore = dns.GetContainerWithId(ContainerApiStoreId);
         //    var eventStore = dns.GetContainerWithId(ContainerEventStoreId);
@@ -236,7 +236,7 @@ namespace Dns.Structurizr
 
         private static void CreateContextView(ViewSet views, Model model)
         {
-            var dns= model.GetSoftwareSystemWithId(SoftwareSystemDnsId);
+            var dns = model.GetSoftwareSystemWithId(SoftwareSystemDnsId);
             var user = model.GetPersonWithName(PersonUserName);
 
             var contextView = views
@@ -253,7 +253,7 @@ namespace Dns.Structurizr
 
         private static void CreateApiContainerView(ViewSet views, Model model)
         {
-            var dns= model.GetSoftwareSystemWithId(SoftwareSystemDnsId);
+            var dns = model.GetSoftwareSystemWithId(SoftwareSystemDnsId);
             var projectionProducer = model.GetSoftwareSystemWithId(SoftwareSystemProjectionProducerId);
 
             var user = model.GetPersonWithName(PersonUserName);
@@ -278,7 +278,7 @@ namespace Dns.Structurizr
 
         private static void CreateApiRunnerContainerView(ViewSet views, Model model)
         {
-            var dns= model.GetSoftwareSystemWithId(SoftwareSystemDnsId);
+            var dns = model.GetSoftwareSystemWithId(SoftwareSystemDnsId);
             var api = model.GetSoftwareSystemWithId(SoftwareSystemApiId);
 
             var apiRunner = dns.GetContainerWithId(ContainerApiRunnerId);

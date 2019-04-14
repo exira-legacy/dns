@@ -87,7 +87,7 @@ namespace Dns.Api.Domain.Responses
                 Services = new List<DomainServiceListItemResponse>
                 {
                     new DomainServiceListItemResponse(
-                        new DomainDetail { Name = "exira.com" }, 
+                        new DomainDetail { Name = "exira.com" },
                         new DomainDetail.DomainDetailService(
                             Guid.NewGuid(),
                             ServiceType.manual.Value,

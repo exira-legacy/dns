@@ -7,6 +7,6 @@ namespace Dns.Domain.Services.Manual.Exceptions
 
     public class EmptyManualLabelException : InvalidManualLabelException
     {
-        public EmptyManualLabelException() : base("Label of a manual service cannot be empty.") {}
+        public EmptyManualLabelException() : base("Label of a manual service cannot be empty.") { }
     }
 }

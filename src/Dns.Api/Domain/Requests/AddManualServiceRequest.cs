@@ -74,8 +74,7 @@ namespace Dns.Api.Domain.Requests
     public class AddManualServiceRequestExample : IExamplesProvider
     {
         public object GetExamples()
-        {
-            return new AddManualServiceRequest
+            => new AddManualServiceRequest
             {
                 ServiceId = Guid.NewGuid(),
                 Label = "My Special Set",
@@ -90,7 +89,6 @@ namespace Dns.Api.Domain.Requests
                     }
                 }
             };
-        }
     }
 
     public static class AddManualServiceRequestMapping
@@ -98,12 +96,10 @@ namespace Dns.Api.Domain.Requests
         public static AddManual Map(
             DomainName domainName,
             AddManualServiceRequest message)
-        {
-            return new AddManual(
+            => new AddManual(
                 domainName,
                 new ServiceId(message.ServiceId.Value),
                 new ManualLabel(message.Label),
                 new RecordSet(message.Records.Select(x => x.ToRecord())));
-        }
     }
 }

@@ -19,14 +19,20 @@ namespace Dns.Api.Infrastructure
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Diagnostics.HealthChecks;
     using Microsoft.Extensions.Logging;
     using Modules;
+    using Projections.Api;
     using SqlStreamStore;
     using Swashbuckle.AspNetCore.Swagger;
 
     /// <summary>Represents the startup process for the application.</summary>
     public class Startup
     {
+        private const string DatabaseTag = "db";
+        private const string DefaultCulture = "en-GB";
+        private const string SupportedCultures = "en-GB;en-US;en;nl-BE;nl;fr-BE;fr";
+
         private IContainer _applicationContainer;
 
         private readonly IConfiguration _configuration;
@@ -44,15 +50,12 @@ namespace Dns.Api.Infrastructure
         /// <param name="services">The collection of services to configure the application with.</param>
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            const string defaultCulture = "en-GB";
-            var supportedCultures = $"{defaultCulture};en-US;en;fr-FR;fr";
-
             services
                 .ConfigureDefaultForApi<Startup, SharedResources>(new StartupConfigureOptions
                 {
                     Cors =
                     {
-                        Headers = _configuration
+                        Origins = _configuration
                             .GetSection("Cors")
                             .GetChildren()
                             .Select(c => c.Value)
@@ -76,15 +79,32 @@ namespace Dns.Api.Infrastructure
                     },
                     Localization =
                     {
-                        DefaultCulture = new CultureInfo(defaultCulture),
-                        SupportedCultures = supportedCultures
+                        DefaultCulture = new CultureInfo(DefaultCulture),
+                        SupportedCultures = SupportedCultures
                             .Split(';', StringSplitOptions.RemoveEmptyEntries)
-                            .Select(x => new CultureInfo(x))
+                            .Select(x => new CultureInfo(x.Trim()))
                             .ToArray()
                     },
                     MiddlewareHooks =
                     {
-                        FluentValidation = fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>()
+                        FluentValidation = fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>(),
+
+                        AfterHealthChecks = health =>
+                        {
+                            var connectionStrings = _configuration
+                                .GetSection("ConnectionStrings")
+                                .GetChildren();
+
+                            foreach (var connectionString in connectionStrings)
+                                health.AddSqlServer(
+                                    connectionString.Value,
+                                    name: $"sqlserver-{connectionString.Key.ToLowerInvariant()}",
+                                    tags: new[] { DatabaseTag, "sql", "sqlserver" });
+
+                            health.AddDbContextCheck<ApiProjectionsContext>(
+                                $"dbcontext-{nameof(ApiProjectionsContext).ToLowerInvariant()}",
+                                tags: new[] { DatabaseTag, "sql", "sqlserver" });
+                        }
                     }
                 });
 
@@ -104,9 +124,11 @@ namespace Dns.Api.Infrastructure
             IApiVersionDescriptionProvider apiVersionProvider,
             ApiDataDogToggle datadogToggle,
             ApiDebugDataDogToggle debugDataDogToggle,
-            MsSqlStreamStore streamStore)
+            MsSqlStreamStore streamStore,
+            HealthCheckService healthCheckService)
         {
-            //StartupHelpers.EnsureSqlStreamStoreSchema<Startup>(streamStore, loggerFactory);
+            StartupHelpers.CheckDatabases(healthCheckService, DatabaseTag).GetAwaiter().GetResult();
+            StartupHelpers.EnsureSqlStreamStoreSchema<Startup>(streamStore, loggerFactory);
 
             if (datadogToggle.FeatureEnabled)
             {
@@ -119,42 +141,42 @@ namespace Dns.Api.Infrastructure
                     pathToCheck => pathToCheck != "/");
             }
 
-            app
-                .UseDefaultForApi(new StartupUseOptions
+            app.UseDefaultForApi(new StartupUseOptions
+            {
+                Common =
+				{
+                    ApplicationContainer = _applicationContainer,
+                    ServiceProvider = serviceProvider,
+                    HostingEnvironment = env,
+                    ApplicationLifetime = appLifetime,
+                    LoggerFactory = loggerFactory,
+                },
+                Api =
                 {
-                    Common = {
-                        ApplicationContainer = _applicationContainer,
-                        ServiceProvider = serviceProvider,
-                        HostingEnvironment = env,
-                        ApplicationLifetime = appLifetime,
-                        LoggerFactory = loggerFactory,
-                    },
-                    Api =
+                    VersionProvider = apiVersionProvider,
+                    Info = groupName => $"exira.com - Dns API {groupName}",
+                    CustomExceptionHandlers = new IExceptionHandler[]
                     {
-                        VersionProvider = apiVersionProvider,
-                        Info = groupName => $"exira.com - Dns API {groupName}",
-                        CustomExceptionHandlers = new IExceptionHandler[]
-                        {
-                            new DomainExceptionHandler(),
-                            new Exceptions.ApiExceptionHandler(),
-                            new AggregateNotFoundExceptionHandling(),
-                            new WrongExpectedVersionExceptionHandling(),
-                            new InvalidTopLevelDomainExceptionHandling(),
-                            new InvalidRecordTypeExceptionHandling(),
-                            new InvalidServiceTypeExceptionHandling(),
-                            new ValidationExceptionHandling(),
-                        }
-                    },
-                    Server =
-                    {
-                        PoweredByName = "exira.com - exira.com",
-                        ServerName = "exira.com"
-                    },
-                    MiddlewareHooks =
-                    {
-                        AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>(),
-                    },
-                });
+                        new DomainExceptionHandler(),
+                        new Exceptions.ApiExceptionHandler(),
+                        new AggregateNotFoundExceptionHandling(),
+                        new WrongExpectedVersionExceptionHandling(),
+                        new InvalidTopLevelDomainExceptionHandling(),
+                        new InvalidRecordTypeExceptionHandling(),
+                        new InvalidServiceTypeExceptionHandling(),
+                        new ValidationExceptionHandling(),
+                    }
+                },
+                Server =
+                {
+                    PoweredByName = "exira.com - exira.com",
+                    ServerName = "exira.com"
+                },
+                MiddlewareHooks =
+                {
+                    AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>(),
+                },
+            });
         }
 
         private static string GetApiLeadingText(ApiVersionDescription description)

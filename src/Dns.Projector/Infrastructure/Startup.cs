@@ -1,6 +1,7 @@
 namespace Dns.Projector.Infrastructure
 {
     using System;
+    using System.Globalization;
     using System.Linq;
     using System.Reflection;
     using Be.Vlaanderen.Basisregisters.Api;
@@ -8,8 +9,10 @@ namespace Dns.Projector.Infrastructure
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
+    using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using Configuration;
+    using Dns.Projections.Api;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -24,6 +27,10 @@ namespace Dns.Projector.Infrastructure
     /// <summary>Represents the startup process for the application.</summary>
     public class Startup
     {
+        private const string DatabaseTag = "db";
+        private const string DefaultCulture = "en-GB";
+        private const string SupportedCultures = "en-GB;en-US;en;nl-BE;nl;fr-BE;fr";
+
         private IContainer _applicationContainer;
 
         private readonly IConfiguration _configuration;
@@ -42,11 +49,11 @@ namespace Dns.Projector.Infrastructure
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services
-                .ConfigureDefaultForApi<Startup>(new StartupConfigureOptions
+                .ConfigureDefaultForApi<Startup, SharedResources>(new StartupConfigureOptions
                 {
                     Cors =
                     {
-                        Headers = _configuration
+                        Origins = _configuration
                             .GetSection("Cors")
                             .GetChildren()
                             .Select(c => c.Value)
@@ -57,7 +64,7 @@ namespace Dns.Projector.Infrastructure
                         ApiInfo = (provider, description) => new Info
                         {
                             Version = description.ApiVersion.ToString(),
-                            Title = "Dns API",
+                            Title = "Dns Projector API",
                             Description = GetApiLeadingText(description),
                             Contact = new Contact
                             {
@@ -67,6 +74,35 @@ namespace Dns.Projector.Infrastructure
                             }
                         },
                         XmlCommentPaths = new [] { typeof(Startup).GetTypeInfo().Assembly.GetName().Name }
+                    },
+                    Localization =
+                    {
+                        DefaultCulture = new CultureInfo(DefaultCulture),
+                        SupportedCultures = SupportedCultures
+                            .Split(';', StringSplitOptions.RemoveEmptyEntries)
+                            .Select(x => new CultureInfo(x.Trim()))
+                            .ToArray()
+                    },
+                    MiddlewareHooks =
+                    {
+                        FluentValidation = fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>(),
+
+                        AfterHealthChecks = health =>
+                        {
+                            var connectionStrings = _configuration
+                                .GetSection("ConnectionStrings")
+                                .GetChildren();
+
+                            foreach (var connectionString in connectionStrings)
+                                health.AddSqlServer(
+                                    connectionString.Value,
+                                    name: $"sqlserver-{connectionString.Key.ToLowerInvariant()}",
+                                    tags: new[] { DatabaseTag, "sql", "sqlserver" });
+
+                            health.AddDbContextCheck<ApiProjectionsContext>(
+                                $"dbcontext-{nameof(ApiProjectionsContext).ToLowerInvariant()}",
+                                tags: new[] { DatabaseTag, "sql", "sqlserver" });
+                        }
                     }
                 });
 
@@ -103,7 +139,8 @@ namespace Dns.Projector.Infrastructure
 
             app.UseDefaultForApi(new StartupUseOptions
             {
-                Common = { 
+                Common =
+                {
                     ApplicationContainer = _applicationContainer,
                     ServiceProvider = serviceProvider,
                     HostingEnvironment = env,
@@ -113,7 +150,11 @@ namespace Dns.Projector.Infrastructure
                 Api =
                 {
                     VersionProvider = apiVersionProvider,
-                    Info = groupName => $"exira.com - Dns API {groupName}",
+                    Info = groupName => $"exira.com - Dns Projector API {groupName}",
+                    CustomExceptionHandlers = new IExceptionHandler[]
+                    {
+                        new ValidationExceptionHandling(),
+                    }
                 },
                 Server =
                 {

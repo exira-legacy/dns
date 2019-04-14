@@ -7,8 +7,7 @@ namespace Dns.Projections.Api
     public class ApiProjectionsContextMigrationFactory : RunnerDbContextMigrationFactory<ApiProjectionsContext>
     {
         public ApiProjectionsContextMigrationFactory()
-            : base("ApiProjectionsAdmin", HistoryConfiguration)
-        { }
+            : base("ApiProjectionsAdmin", HistoryConfiguration) { }
 
         private static MigrationHistoryConfiguration HistoryConfiguration =>
             new MigrationHistoryConfiguration

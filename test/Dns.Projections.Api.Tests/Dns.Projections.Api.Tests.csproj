@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\packages\Be.Vlaanderen.Basisregisters.Build.Pipeline\Content\Be.Vlaanderen.Basisregisters.Build.Pipeline.Settings.Test.props" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Dns\Dns.csproj" />
+    <ProjectReference Include="..\..\src\Dns.Infrastructure\Dns.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Dns.Projections.Api\Dns.Projections.Api.csproj" />
+    <ProjectReference Include="..\..\test\Dns.Tests\Dns.Tests.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>
