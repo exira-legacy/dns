@@ -53,10 +53,9 @@ namespace Dns.Api.Domain
                 request.TopLevelDomain = topLevelDomain;
             }
 
+            // TODO: We can check in the eventstore if those aggregates even exist
             await new AddManualServiceRequestValidator()
                 .ValidateAndThrowAsync(request, cancellationToken: cancellationToken);
-
-            await FindDomainAsync(context, secondLevelDomain, topLevelDomain, cancellationToken);
 
             var command = AddManualServiceRequestMapping.Map(
                 new DomainName(

@@ -53,10 +53,9 @@ namespace Dns.Api.Domain
                 request.TopLevelDomain = topLevelDomain;
             }
 
+            // TODO: We can check in the eventstore if those aggregates even exist
             await new AddGoogleSuiteServiceRequestValidator()
                 .ValidateAndThrowAsync(request, cancellationToken: cancellationToken);
-
-            await FindDomainAsync(context, secondLevelDomain, topLevelDomain, cancellationToken);
 
             var command = AddGoogleSuiteServiceRequestMapping.Map(
                 new DomainName(

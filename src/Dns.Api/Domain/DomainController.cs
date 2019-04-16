@@ -148,10 +148,13 @@ namespace Dns.Api.Domain
             await new DetailDomainRequestValidator()
                 .ValidateAndThrowAsync(request, cancellationToken: cancellationToken);
 
-            var domain = await FindDomainAsync(context, secondLevelDomain, topLevelDomain, cancellationToken);
-
             return Ok(
-                new DomainDetailResponse(domain));
+                new DomainDetailResponse(
+                    await FindDomainAsync(
+                        context,
+                        secondLevelDomain,
+                        topLevelDomain,
+                        cancellationToken)));
         }
 
         /// <summary>
@@ -288,12 +291,9 @@ namespace Dns.Api.Domain
                 ServiceId = serviceId
             };
 
+            // TODO: We can check in the eventstore if those aggregates even exist
             await new RemoveServiceRequestValidator()
                 .ValidateAndThrowAsync(request, cancellationToken: cancellationToken);
-
-            await FindServiceAsync(context, serviceId, cancellationToken);
-
-            await FindDomainAsync(context, secondLevelDomain, topLevelDomain, cancellationToken);
 
             var command = RemoveServiceRequestMapping.Map(request);
 
