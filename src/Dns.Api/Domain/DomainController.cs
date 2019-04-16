@@ -11,8 +11,8 @@ namespace Dns.Api.Domain
     using Be.Vlaanderen.Basisregisters.Api.Search.Pagination;
     using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
+    using Dns.Api.Infrastructure.LastObservedPosition;
     using Infrastructure;
-    using Infrastructure.Responses;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
@@ -43,11 +43,11 @@ namespace Dns.Api.Domain
         /// <response code="500">If an internal error has occurred.</response>
         /// <returns></returns>
         [HttpPost]
-        [ProducesResponseType(typeof(void), StatusCodes.Status202Accepted)]
+        [ProducesResponseType(typeof(LastObservedPositionResponse), StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(BasicApiValidationProblem), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
         [SwaggerRequestExample(typeof(CreateDomainRequest), typeof(CreateDomainRequestExample))]
-        [SwaggerResponseExample(StatusCodes.Status202Accepted, typeof(EmptyResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status202Accepted, typeof(LastObservedPositionResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(ValidationErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         public async Task<IActionResult> CreateDomain(
@@ -67,11 +67,12 @@ namespace Dns.Api.Domain
 
             return Accepted(
                 $"/v1/domains/{command.DomainName}",
-                await bus.Dispatch(
-                    commandId,
-                    command,
-                    GetMetadata(),
-                    cancellationToken));
+                new LastObservedPositionResponse(
+                    await bus.Dispatch(
+                        commandId,
+                        command,
+                        GetMetadata(),
+                        cancellationToken)));
         }
 
         /// <summary>
@@ -263,11 +264,11 @@ namespace Dns.Api.Domain
         /// <response code="500">If an internal error has occurred.</response>
         /// <returns></returns>
         [HttpDelete("{secondLevelDomain}.{topLevelDomain}/services/{serviceId}")]
-        [ProducesResponseType(typeof(void), StatusCodes.Status202Accepted)]
+        [ProducesResponseType(typeof(LastObservedPositionResponse), StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(BasicApiValidationProblem), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
-        [SwaggerResponseExample(StatusCodes.Status202Accepted, typeof(EmptyResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status202Accepted, typeof(LastObservedPositionResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(ValidationErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status404NotFound, typeof(ServiceNotFoundResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
@@ -298,11 +299,12 @@ namespace Dns.Api.Domain
 
             return Accepted(
                 $"/v1/domains/{command.DomainName}/services",
-                await bus.Dispatch(
-                    commandId,
-                    command,
-                    GetMetadata(),
-                    cancellationToken));
+                new LastObservedPositionResponse(
+                    await bus.Dispatch(
+                        commandId,
+                        command,
+                        GetMetadata(),
+                        cancellationToken)));
         }
 
         private static async Task<DomainDetail> FindDomainAsync(

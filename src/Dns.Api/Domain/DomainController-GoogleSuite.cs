@@ -6,7 +6,7 @@ namespace Dns.Api.Domain
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
-    using Infrastructure.Responses;
+    using Dns.Api.Infrastructure.LastObservedPosition;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Newtonsoft.Json.Converters;
@@ -31,11 +31,11 @@ namespace Dns.Api.Domain
         /// <response code="500">If an internal error has occurred.</response>
         /// <returns></returns>
         [HttpPost("{secondLevelDomain}.{topLevelDomain}/services/googlesuite")]
-        [ProducesResponseType(typeof(void), StatusCodes.Status202Accepted)]
+        [ProducesResponseType(typeof(LastObservedPositionResponse), StatusCodes.Status202Accepted)]
         [ProducesResponseType(typeof(BasicApiValidationProblem), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
         [SwaggerRequestExample(typeof(AddGoogleSuiteServiceRequest), typeof(AddGoogleSuiteServiceRequestExample))]
-        [SwaggerResponseExample(StatusCodes.Status202Accepted, typeof(EmptyResponseExamples), jsonConverter: typeof(StringEnumConverter))]
+        [SwaggerResponseExample(StatusCodes.Status202Accepted, typeof(LastObservedPositionResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(ValidationErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         public async Task<IActionResult> AddGoogleSuiteService(
@@ -66,11 +66,12 @@ namespace Dns.Api.Domain
 
             return Accepted(
                 $"/v1/domains/{command.DomainName}/services/{command.ServiceId}",
-                await bus.Dispatch(
-                    commandId,
-                    command,
-                    GetMetadata(),
-                    cancellationToken));
+                new LastObservedPositionResponse(
+                    await bus.Dispatch(
+                        commandId,
+                        command,
+                        GetMetadata(),
+                        cancellationToken)));
         }
     }
 }
