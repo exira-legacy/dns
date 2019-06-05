@@ -1,17 +1,18 @@
 namespace Dns.Api.Infrastructure.Exceptions
 {
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.BasicApiProblem;
 
     public class ApiExceptionHandler : DefaultExceptionHandler<ApiException>
     {
-        protected override BasicApiProblem GetApiProblemFor(ApiException exception)
-            => new BasicApiProblem
+        protected override ProblemDetails GetApiProblemFor(ApiException exception)
+            => new ProblemDetails
             {
                 HttpStatus = exception.StatusCode,
                 Title = Constants.DefaultTitle,
                 Detail = exception.Message,
-                ProblemInstanceUri = BasicApiProblem.GetProblemNumber(),
-                ProblemTypeUri = BasicApiProblem.GetTypeUriFor(exception)
+                ProblemInstanceUri = ProblemDetails.GetProblemNumber(),
+                ProblemTypeUri = ProblemDetails.GetTypeUriFor(exception)
             };
     }
 }

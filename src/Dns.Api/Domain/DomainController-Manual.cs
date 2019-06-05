@@ -6,13 +6,14 @@ namespace Dns.Api.Domain
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.CommandHandling;
-    using Dns.Api.Infrastructure.LastObservedPosition;
+    using Infrastructure.LastObservedPosition;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Newtonsoft.Json.Converters;
     using Projections.Api;
     using Requests;
     using Swashbuckle.AspNetCore.Filters;
+    using ProblemDetails = Be.Vlaanderen.Basisregisters.BasicApiProblem.ProblemDetails;
 
     public partial class DomainController
     {
@@ -32,8 +33,8 @@ namespace Dns.Api.Domain
         /// <returns></returns>
         [HttpPost("{secondLevelDomain}.{topLevelDomain}/services/manual")]
         [ProducesResponseType(typeof(LastObservedPositionResponse), StatusCodes.Status202Accepted)]
-        [ProducesResponseType(typeof(BasicApiValidationProblem), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(BasicApiProblem), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         [SwaggerRequestExample(typeof(AddManualServiceRequest), typeof(AddManualServiceRequestExample))]
         [SwaggerResponseExample(StatusCodes.Status202Accepted, typeof(LastObservedPositionResponseExamples), jsonConverter: typeof(StringEnumConverter))]
         [SwaggerResponseExample(StatusCodes.Status400BadRequest, typeof(ValidationErrorResponseExamples), jsonConverter: typeof(StringEnumConverter))]

@@ -1,9 +1,9 @@
 namespace Dns.Api.Infrastructure
 {
+    using System.Linq;
     using Be.Vlaanderen.Basisregisters.Api.Localization;
     using FluentValidation;
     using Microsoft.Extensions.Localization;
-    using System.Linq;
 
     public class ValidationExtensionsResources
     {

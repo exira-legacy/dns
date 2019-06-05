@@ -4,12 +4,11 @@ namespace Dns.Projector.Infrastructure
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
-    using Be.Vlaanderen.Basisregisters.Api;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.AspNetCore;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
+    using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using Configuration;
     using Dns.Projections.Api;
@@ -23,7 +22,6 @@ namespace Dns.Projector.Infrastructure
     using Modules;
     using SqlStreamStore;
     using Swashbuckle.AspNetCore.Swagger;
-    using TraceSource = Be.Vlaanderen.Basisregisters.DataDog.Tracing.TraceSource;
 
     /// <summary>Represents the startup process for the application.</summary>
     public class Startup
@@ -121,54 +119,51 @@ namespace Dns.Projector.Infrastructure
             IApplicationLifetime appLifetime,
             ILoggerFactory loggerFactory,
             IApiVersionDescriptionProvider apiVersionProvider,
+            MsSqlStreamStore streamStore,
             ApiDataDogToggle datadogToggle,
             ApiDebugDataDogToggle debugDataDogToggle,
-            MsSqlStreamStore streamStore,
             HealthCheckService healthCheckService)
         {
             StartupHelpers.CheckDatabases(healthCheckService, DatabaseTag).GetAwaiter().GetResult();
             StartupHelpers.EnsureSqlStreamStoreSchema<Startup>(streamStore, loggerFactory);
 
-            if (datadogToggle.FeatureEnabled)
-            {
-                if (debugDataDogToggle.FeatureEnabled)
-                    StartupHelpers.SetupSourceListener(serviceProvider.GetRequiredService<TraceSource>());
+            app
+                .UseDatadog<Startup>(
+                serviceProvider,
+                loggerFactory,
+                datadogToggle,
+                debugDataDogToggle,
+                _configuration["DataDog:ServiceName"])
 
-                app.UseDataDogTracing(
-                    serviceProvider.GetRequiredService<TraceSource>(),
-                    _configuration["DataDog:ServiceName"],
-                    pathToCheck => pathToCheck != "/");
-            }
-
-            app.UseDefaultForApi(new StartupUseOptions
-            {
-                Common =
+                .UseDefaultForApi(new StartupUseOptions
                 {
-                    ApplicationContainer = _applicationContainer,
-                    ServiceProvider = serviceProvider,
-                    HostingEnvironment = env,
-                    ApplicationLifetime = appLifetime,
-                    LoggerFactory = loggerFactory,
-                },
-                Api =
-                {
-                    VersionProvider = apiVersionProvider,
-                    Info = groupName => $"exira.com - Dns Projector API {groupName}",
-                    CustomExceptionHandlers = new IExceptionHandler[]
+                    Common =
                     {
-                        new ValidationExceptionHandling(),
+                        ApplicationContainer = _applicationContainer,
+                        ServiceProvider = serviceProvider,
+                        HostingEnvironment = env,
+                        ApplicationLifetime = appLifetime,
+                        LoggerFactory = loggerFactory,
+                    },
+                    Api =
+                    {
+                        VersionProvider = apiVersionProvider,
+                        Info = groupName => $"exira.com - Dns Projector API {groupName}",
+                        CustomExceptionHandlers = new IExceptionHandler[]
+                        {
+                            new ValidationExceptionHandler(),
+                        }
+                    },
+                    Server =
+                    {
+                        PoweredByName = "exira.com - exira.com",
+                        ServerName = "exira.com"
+                    },
+                    MiddlewareHooks =
+                    {
+                        AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>(),
                     }
-                },
-                Server =
-                {
-                    PoweredByName = "exira.com - exira.com",
-                    ServerName = "exira.com"
-                },
-                MiddlewareHooks =
-                {
-                    AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>(),
-                }
-            });
+                });
 
             var projectionsManager = serviceProvider.GetRequiredService<IConnectedProjectionsManager>();
             projectionsManager.Start();

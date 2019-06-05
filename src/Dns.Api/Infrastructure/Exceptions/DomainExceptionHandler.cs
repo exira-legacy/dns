@@ -1,21 +1,20 @@
 namespace Dns.Api.Infrastructure.Exceptions
 {
-    using System.Net;
     using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
+    using Be.Vlaanderen.Basisregisters.BasicApiProblem;
+    using Microsoft.AspNetCore.Http;
 
     public class DomainExceptionHandler : DefaultExceptionHandler<DomainException>
     {
-        protected override BasicApiProblem GetApiProblemFor(DomainException exception)
-        {
-            return new BasicApiProblem
+        protected override ProblemDetails GetApiProblemFor(DomainException exception)
+            => new ProblemDetails
             {
-                HttpStatus = (int)HttpStatusCode.BadRequest,
+                HttpStatus = StatusCodes.Status400BadRequest,
                 Title = Constants.DefaultTitle,
                 Detail = exception.Message,
-                ProblemInstanceUri = BasicApiProblem.GetProblemNumber(),
-                ProblemTypeUri = BasicApiProblem.GetTypeUriFor(exception)
+                ProblemInstanceUri = ProblemDetails.GetProblemNumber(),
+                ProblemTypeUri = ProblemDetails.GetTypeUriFor(exception)
             };
-        }
     }
 }

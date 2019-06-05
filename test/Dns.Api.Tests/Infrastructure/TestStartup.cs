@@ -116,7 +116,7 @@ namespace Dns.Api.Tests.Infrastructure
                         new InvalidTopLevelDomainExceptionHandling(),
                         new InvalidRecordTypeExceptionHandling(),
                         new InvalidServiceTypeExceptionHandling(),
-                        new ValidationExceptionHandling(),
+                        new ValidationExceptionHandler(),
                     }
                 },
                 Server =

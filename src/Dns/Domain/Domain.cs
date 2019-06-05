@@ -1,8 +1,8 @@
 namespace Dns.Domain
 {
-    using Be.Vlaanderen.Basisregisters.AggregateSource;
     using System;
     using System.Linq;
+    using Be.Vlaanderen.Basisregisters.AggregateSource;
     using Events;
     using Exceptions;
     using Services.GoogleSuite;

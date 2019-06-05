@@ -1,10 +1,10 @@
 namespace Dns.Projections.Api.ServiceDetail
 {
+    using System;
+    using System.Linq;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
-    using System;
-    using System.Linq;
 
     public class ServiceDetail
     {

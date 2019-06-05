@@ -5,9 +5,9 @@ namespace Dns.Api.Infrastructure.Modules
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Be.Vlaanderen.Basisregisters.EventHandling;
     using Be.Vlaanderen.Basisregisters.EventHandling.Autofac;
+    using Dns.Infrastructure.Modules;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Dns.Infrastructure.Modules;
     using Microsoft.Extensions.Logging;
     using Projections.Api;
 

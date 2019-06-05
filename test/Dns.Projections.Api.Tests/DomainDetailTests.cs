@@ -4,12 +4,12 @@ namespace Dns.Projections.Api.Tests
     using System.Linq;
     using System.Threading.Tasks;
     using AutoFixture;
+    using Dns.Tests.Infrastructure;
     using Domain.Events;
     using DomainDetail;
     using Infrastructure;
     using Xunit;
     using Xunit.Abstractions;
-    using Dns.Tests.Infrastructure;
 
     public class DomainDetailTests : ProjectionsTest
     {

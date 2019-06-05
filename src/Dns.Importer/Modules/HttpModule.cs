@@ -2,9 +2,9 @@ namespace Dns.Importer.Modules
 {
     using System;
     using Autofac;
-    using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
     using Polly;
     using HttpClientHandler = System.Net.Http.HttpClientHandler;
 

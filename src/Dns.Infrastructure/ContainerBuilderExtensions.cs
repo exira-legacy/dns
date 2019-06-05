@@ -2,8 +2,8 @@ namespace Dns.Infrastructure
 {
     using System;
     using Autofac;
-    using Be.Vlaanderen.Basisregisters.AggregateSource.SqlStreamStore.Autofac;
     using Autofac.Core.Registration;
+    using Be.Vlaanderen.Basisregisters.AggregateSource.SqlStreamStore.Autofac;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.SqlStreamStore;
     using Microsoft.Extensions.Configuration;
 

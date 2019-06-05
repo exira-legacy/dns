@@ -4,12 +4,10 @@ namespace Dns.Api.Infrastructure
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
-    using Be.Vlaanderen.Basisregisters.Api;
     using Autofac;
     using Autofac.Extensions.DependencyInjection;
+    using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing;
-    using Be.Vlaanderen.Basisregisters.DataDog.Tracing.AspNetCore;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
     using Configuration;
     using Domain.Exceptions;
@@ -122,61 +120,58 @@ namespace Dns.Api.Infrastructure
             IApplicationLifetime appLifetime,
             ILoggerFactory loggerFactory,
             IApiVersionDescriptionProvider apiVersionProvider,
+            MsSqlStreamStore streamStore,
             ApiDataDogToggle datadogToggle,
             ApiDebugDataDogToggle debugDataDogToggle,
-            MsSqlStreamStore streamStore,
             HealthCheckService healthCheckService)
         {
             StartupHelpers.CheckDatabases(healthCheckService, DatabaseTag).GetAwaiter().GetResult();
             StartupHelpers.EnsureSqlStreamStoreSchema<Startup>(streamStore, loggerFactory);
 
-            if (datadogToggle.FeatureEnabled)
-            {
-                if (debugDataDogToggle.FeatureEnabled)
-                    StartupHelpers.SetupSourceListener(serviceProvider.GetRequiredService<TraceSource>());
+            app
+                .UseDatadog<Startup>(
+                    serviceProvider,
+                    loggerFactory,
+                    datadogToggle,
+                    debugDataDogToggle,
+                    _configuration["DataDog:ServiceName"])
 
-                app.UseDataDogTracing(
-                    serviceProvider.GetRequiredService<TraceSource>(),
-                    _configuration["DataDog:ServiceName"],
-                    pathToCheck => pathToCheck != "/");
-            }
-
-            app.UseDefaultForApi(new StartupUseOptions
-            {
-                Common =
-				{
-                    ApplicationContainer = _applicationContainer,
-                    ServiceProvider = serviceProvider,
-                    HostingEnvironment = env,
-                    ApplicationLifetime = appLifetime,
-                    LoggerFactory = loggerFactory,
-                },
-                Api =
+                .UseDefaultForApi(new StartupUseOptions
                 {
-                    VersionProvider = apiVersionProvider,
-                    Info = groupName => $"exira.com - Dns API {groupName}",
-                    CustomExceptionHandlers = new IExceptionHandler[]
+                    Common =
+				    {
+                        ApplicationContainer = _applicationContainer,
+                        ServiceProvider = serviceProvider,
+                        HostingEnvironment = env,
+                        ApplicationLifetime = appLifetime,
+                        LoggerFactory = loggerFactory,
+                    },
+                    Api =
                     {
-                        new DomainExceptionHandler(),
-                        new Exceptions.ApiExceptionHandler(),
-                        new AggregateNotFoundExceptionHandling(),
-                        new WrongExpectedVersionExceptionHandling(),
-                        new InvalidTopLevelDomainExceptionHandling(),
-                        new InvalidRecordTypeExceptionHandling(),
-                        new InvalidServiceTypeExceptionHandling(),
-                        new ValidationExceptionHandling(),
-                    }
-                },
-                Server =
-                {
-                    PoweredByName = "exira.com - exira.com",
-                    ServerName = "exira.com"
-                },
-                MiddlewareHooks =
-                {
-                    AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>(),
-                },
-            });
+                        VersionProvider = apiVersionProvider,
+                        Info = groupName => $"exira.com - Dns API {groupName}",
+                        CustomExceptionHandlers = new IExceptionHandler[]
+                        {
+                            new DomainExceptionHandler(),
+                            new Exceptions.ApiExceptionHandler(),
+                            new AggregateNotFoundExceptionHandling(),
+                            new WrongExpectedVersionExceptionHandling(),
+                            new InvalidTopLevelDomainExceptionHandling(),
+                            new InvalidRecordTypeExceptionHandling(),
+                            new InvalidServiceTypeExceptionHandling(),
+                            new ValidationExceptionHandler(),
+                        }
+                    },
+                    Server =
+                    {
+                        PoweredByName = "exira.com - exira.com",
+                        ServerName = "exira.com"
+                    },
+                    MiddlewareHooks =
+                    {
+                        AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>(),
+                    },
+                });
         }
 
         private static string GetApiLeadingText(ApiVersionDescription description)
