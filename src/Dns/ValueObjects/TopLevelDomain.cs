@@ -39,7 +39,9 @@ namespace Dns
             one = new TopLevelDomain("one", ".one", "One"),
             org = new TopLevelDomain("org", ".org", "Organisation"),
             se = new TopLevelDomain("se", ".se", "Sweden"),
-            vlaanderen = new TopLevelDomain("vlaanderen", ".vlaanderen", "Flanders");
+            vlaanderen = new TopLevelDomain("vlaanderen", ".vlaanderen", "Flanders"),
+            pro = new TopLevelDomain("pro", ".pro", "Professional"),
+            immo = new TopLevelDomain("immo", ".immo", "Real Estate");
 
         private TopLevelDomain(
             string extension,

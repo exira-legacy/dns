@@ -19,10 +19,10 @@ namespace Dns.Domain.Events
 
         [JsonConstructor]
         private RecordData(
-            string type,
-            int timeToLive,
-            string label,
-            string value)
+            [JsonProperty("type")] string type,
+            [JsonProperty("timeToLive")] int timeToLive,
+            [JsonProperty("label")] string label,
+            [JsonProperty("value")] string value)
             : this(
                 new Record(
                     RecordType.FromValue(type.ToLowerInvariant()),

@@ -22,8 +22,8 @@ namespace Dns.Domain.Events
 
         [JsonConstructor]
         private DomainWasCreated(
-            string secondLevelDomain,
-            string topLevelDomain)
+            [JsonProperty("secondLevelDomain")] string secondLevelDomain,
+            [JsonProperty("topLevelDomain")] string topLevelDomain)
             : this(
                 new DomainName(
                     new SecondLevelDomain(secondLevelDomain),

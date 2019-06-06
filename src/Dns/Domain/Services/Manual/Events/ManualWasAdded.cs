@@ -46,11 +46,11 @@ namespace Dns.Domain.Services.Manual.Events
 
         [JsonConstructor]
         private ManualWasAdded(
-            string secondLevelDomain,
-            string topLevelDomain,
-            Guid serviceId,
-            string serviceLabel,
-            IReadOnlyCollection<RecordData> records)
+            [JsonProperty("secondLevelDomain")] string secondLevelDomain,
+            [JsonProperty("topLevelDomain")] string topLevelDomain,
+            [JsonProperty("serviceId")] Guid serviceId,
+            [JsonProperty("serviceLabel")] string serviceLabel,
+            [JsonProperty("records")] IReadOnlyCollection<RecordData> records)
             : this(
                 new DomainName(
                     new SecondLevelDomain(secondLevelDomain),

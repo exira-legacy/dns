@@ -31,9 +31,9 @@ namespace Dns.Domain.Events
 
         [JsonConstructor]
         private RecordSetWasUpdated(
-            string secondLevelDomain,
-            string topLevelDomain,
-            IReadOnlyCollection<RecordData> records)
+            [JsonProperty("secondLevelDomain")] string secondLevelDomain,
+            [JsonProperty("topLevelDomain")] string topLevelDomain,
+            [JsonProperty("records")] IReadOnlyCollection<RecordData> records)
             : this(
                 new DomainName(
                     new SecondLevelDomain(secondLevelDomain),

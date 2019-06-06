@@ -28,9 +28,9 @@ namespace Dns.Domain.Events
 
         [JsonConstructor]
         private ServiceWasRemoved(
-            string secondLevelDomain,
-            string topLevelDomain,
-            Guid serviceId)
+            [JsonProperty("secondLevelDomain")] string secondLevelDomain,
+            [JsonProperty("topLevelDomain")] string topLevelDomain,
+            [JsonProperty("serviceId")] Guid serviceId)
             : this(
                 new DomainName(
                     new SecondLevelDomain(secondLevelDomain),

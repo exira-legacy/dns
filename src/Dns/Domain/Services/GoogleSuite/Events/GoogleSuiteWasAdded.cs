@@ -38,10 +38,10 @@ namespace Dns.Domain.Services.GoogleSuite.Events
 
         [JsonConstructor]
         private GoogleSuiteWasAdded(
-            string secondLevelDomain,
-            string topLevelDomain,
-            Guid serviceId,
-            string verificationToken)
+            [JsonProperty("secondLevelDomain")] string secondLevelDomain,
+            [JsonProperty("topLevelDomain")] string topLevelDomain,
+            [JsonProperty("serviceId")] Guid serviceId,
+            [JsonProperty("verificationToken")] string verificationToken)
             : this(
                 new DomainName(
                     new SecondLevelDomain(secondLevelDomain),
