@@ -156,7 +156,7 @@ namespace Dns.Projector.Infrastructure
                     },
                     Server =
                     {
-                        PoweredByName = "exira.com - exira.com",
+                        PoweredByName = "exira.com",
                         ServerName = "exira.com"
                     },
                     MiddlewareHooks =

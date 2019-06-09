@@ -164,7 +164,7 @@ namespace Dns.Api.Infrastructure
                     },
                     Server =
                     {
-                        PoweredByName = "exira.com - exira.com",
+                        PoweredByName = "exira.com",
                         ServerName = "exira.com"
                     },
                     MiddlewareHooks =
