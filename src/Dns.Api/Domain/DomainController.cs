@@ -57,6 +57,7 @@ namespace Dns.Api.Domain
             [FromBody] CreateDomainRequest request,
             CancellationToken cancellationToken = default)
         {
+            // TODO: Get this validator from DI
             await new CreateDomainRequestValidator()
                 .ValidateAndThrowAsync(request, cancellationToken: cancellationToken);
 
@@ -94,6 +95,8 @@ namespace Dns.Api.Domain
             [FromServices] ApiProjectionsContext context,
             CancellationToken cancellationToken = default)
         {
+            // TODO: Add support for eventual consistency
+
             var filtering = Request.ExtractFilteringRequest<DomainListFilter>();
             var sorting = Request.ExtractSortingRequest();
             var pagination = Request.ExtractPaginationRequest();
@@ -329,6 +332,9 @@ namespace Dns.Api.Domain
             Guid? serviceId,
             CancellationToken cancellationToken)
         {
+            if (!serviceId.HasValue)
+                throw new ApiException(ServiceNotFoundResponseExamples.Message, StatusCodes.Status404NotFound);
+
             var service = await context
                 .ServiceDetails
                 .FindAsync(new object[] { serviceId.Value }, cancellationToken);

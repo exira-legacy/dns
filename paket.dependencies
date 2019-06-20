@@ -45,11 +45,11 @@ nuget Be.Vlaanderen.Basisregisters.CommandHandling.SqlStreamStore ~> 3.0
 nuget Be.Vlaanderen.Basisregisters.EventHandling ~> 1.0
 nuget Be.Vlaanderen.Basisregisters.EventHandling.Autofac ~> 1.0
 
-nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore ~> 3.1
-nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac ~> 3.1
-nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner ~> 3.1
-nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector ~> 3.1
-nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector.Testing ~> 3.1
+nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore ~> 3.5
+nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore.Autofac ~> 3.5
+nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner ~> 3.5
+nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector ~> 3.5
+nuget Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector.Testing ~> 3.5
 
 nuget Be.Vlaanderen.Basisregisters.Projector ~> 3.1
 
@@ -69,8 +69,8 @@ nuget Microsoft.EntityFrameworkCore.InMemory 2.2.4
 nuget xunit 2.4.1
 nuget xunit.runner.visualstudio 2.4.1
 nuget xunit.categories 2.0.4
-nuget AutoFixture 4.9.0
-nuget AutoFixture.Xunit2 4.9.0
+nuget AutoFixture 4.10.0
+nuget AutoFixture.Xunit2 4.10.0
 
 // BUILD STUFF
 nuget FAKE 4.64.13 // Don't update to v5!
