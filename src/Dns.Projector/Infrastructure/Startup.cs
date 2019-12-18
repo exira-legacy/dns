@@ -9,6 +9,7 @@ namespace Dns.Projector.Infrastructure
     using Be.Vlaanderen.Basisregisters.Api;
     using Be.Vlaanderen.Basisregisters.Api.Exceptions;
     using Be.Vlaanderen.Basisregisters.DataDog.Tracing.Autofac;
+    using Be.Vlaanderen.Basisregisters.Projector;
     using Be.Vlaanderen.Basisregisters.Projector.ConnectedProjections;
     using Configuration;
     using Dns.Projections.Api;
@@ -18,6 +19,7 @@ namespace Dns.Projector.Infrastructure
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Diagnostics.HealthChecks;
+    using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using Modules;
     using SqlStreamStore;
@@ -115,8 +117,8 @@ namespace Dns.Projector.Infrastructure
         public void Configure(
             IServiceProvider serviceProvider,
             IApplicationBuilder app,
-            IHostingEnvironment env,
-            IApplicationLifetime appLifetime,
+            IWebHostEnvironment env,
+            IHostApplicationLifetime appLifetime,
             ILoggerFactory loggerFactory,
             IApiVersionDescriptionProvider apiVersionProvider,
             MsSqlStreamStore streamStore,
@@ -128,12 +130,23 @@ namespace Dns.Projector.Infrastructure
             StartupHelpers.EnsureSqlStreamStoreSchema<Startup>(streamStore, loggerFactory);
 
             app
-                .UseDatadog<Startup>(
-                serviceProvider,
-                loggerFactory,
-                datadogToggle,
-                debugDataDogToggle,
-                _configuration["DataDog:ServiceName"])
+                .UseDataDog<Startup>(new DataDogOptions
+                {
+                    Common =
+                    {
+                        ServiceProvider = serviceProvider,
+                        LoggerFactory = loggerFactory
+                    },
+                    Toggles =
+                    {
+                        Enable = datadogToggle,
+                        Debug = debugDataDogToggle
+                    },
+                    Tracing =
+                    {
+                        ServiceName = _configuration["DataDog:ServiceName"],
+                    }
+                })
 
                 .UseDefaultForApi(new StartupUseOptions
                 {
@@ -163,10 +176,16 @@ namespace Dns.Projector.Infrastructure
                     {
                         AfterMiddleware = x => x.UseMiddleware<AddNoCacheHeadersMiddleware>(),
                     }
-                });
+                })
 
-            var projectionsManager = serviceProvider.GetRequiredService<IConnectedProjectionsManager>();
-            projectionsManager.Start();
+                .UseProjectionsManager(new ProjectionsManagerOptions
+                {
+                    Common =
+                    {
+                        ServiceProvider = serviceProvider,
+                        ApplicationLifetime = appLifetime
+                    }
+                });
         }
 
         private static string GetApiLeadingText(ApiVersionDescription description)

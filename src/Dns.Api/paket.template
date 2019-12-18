@@ -15,10 +15,10 @@ licenseUrl https://opensource.org/licenses/EUPL-1.2
 description Dns.
 
 files
-  Dns.Api.dll => lib\netcoreapp2.2
-  Dns.Api.pdb => lib\netcoreapp2.2
-  Dns.Api.xml => lib\netcoreapp2.2
+  Dns.Api.dll => lib\netcoreapp3.1
+  Dns.Api.pdb => lib\netcoreapp3.1
+  Dns.Api.xml => lib\netcoreapp3.1
   Dns.Api.xml => content
 
-  Dns.dll => lib\netcoreapp2.2
-  Dns.pdb => lib\netcoreapp2.2
+  Dns.dll => lib\netcoreapp3.1
+  Dns.pdb => lib\netcoreapp3.1

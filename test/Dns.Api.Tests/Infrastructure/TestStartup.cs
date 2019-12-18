@@ -18,6 +18,7 @@ namespace Dns.Api.Tests.Infrastructure
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Hosting;
     using Swashbuckle.AspNetCore.Swagger;
 
     public class TestStartup
@@ -88,8 +89,8 @@ namespace Dns.Api.Tests.Infrastructure
         public void Configure(
             IServiceProvider serviceProvider,
             IApplicationBuilder app,
-            IHostingEnvironment env,
-            IApplicationLifetime appLifetime,
+            IWebHostEnvironment env,
+            IHostApplicationLifetime appLifetime,
             ILoggerFactory loggerFactory,
             IApiVersionDescriptionProvider apiVersionProvider)
         {

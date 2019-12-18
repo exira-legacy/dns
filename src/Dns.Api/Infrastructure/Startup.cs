@@ -18,6 +18,7 @@ namespace Dns.Api.Infrastructure
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Diagnostics.HealthChecks;
+    using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using Modules;
     using Projections.Api;
@@ -116,8 +117,8 @@ namespace Dns.Api.Infrastructure
         public void Configure(
             IServiceProvider serviceProvider,
             IApplicationBuilder app,
-            IHostingEnvironment env,
-            IApplicationLifetime appLifetime,
+            IWebHostEnvironment env,
+            IHostApplicationLifetime appLifetime,
             ILoggerFactory loggerFactory,
             IApiVersionDescriptionProvider apiVersionProvider,
             MsSqlStreamStore streamStore,

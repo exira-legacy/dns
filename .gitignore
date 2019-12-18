@@ -7,6 +7,9 @@ tracing*.log
 .vs/
 .fake/
 .idea/
+.ionide/
+.paket/
+
 wwwroot/
 
 [Pp]ackages/

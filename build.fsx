@@ -1,6 +1,14 @@
+#r "paket:
+version 5.241.2
+framework: netstandard20
+source https://api.nuget.org/v3/index.json
+nuget Be.Vlaanderen.Basisregisters.Build.Pipeline 3.2.0 //"
+
 #load "packages/Be.Vlaanderen.Basisregisters.Build.Pipeline/Content/build-generic.fsx"
 
-open Fake
+open Fake.Core
+open Fake.Core.TargetOperators
+open Fake.IO.FileSystemOperators
 open ``Build-generic``
 
 // The buildserver passes in `BITBUCKET_BUILD_NUMBER` as an integer to version the results
@@ -58,62 +66,42 @@ let containerize = containerize dockerRepository
 
 // Solution -----------------------------------------------------------------------
 
-Target "Restore_Solution" (fun _ -> restore "Dns")
+Target.create "Restore_Solution" (fun _ -> restore "Dns")
 
-Target "Build_Solution" (fun _ -> build "Dns")
+Target.create "Build_Solution" (fun _ -> build "Dns")
 
-Target "Test_Solution" (fun _ -> test "Dns")
+Target.create "Test_Solution" (fun _ -> test "Dns")
 
-Target "Publish_Solution" (fun _ ->
+Target.create "Publish_Solution" (fun _ ->
   [
     "Dns.Api"
   ] |> List.iter publish)
 
-Target "Pack_Solution" (fun _ ->
+Target.create "Pack_Solution" (fun _ ->
   [
     "Dns.Api"
   ] |> List.iter pack)
 
-Target "Containerize_Api" (fun _ -> containerize "Dns.Api" "api")
-Target "PushContainer_Api" (fun _ -> push "api")
+Target.create "Containerize_Api" (fun _ -> containerize "Dns.Api" "api")
+Target.create "PushContainer_Api" (fun _ -> push "api")
 
-Target "Containerize_Projector" (fun _ -> containerize "Dns.Projector" "projector")
-Target "PushContainer_Projector" (fun _ -> push "projector")
+Target.create "Containerize_Projector" (fun _ -> containerize "Dns.Projector" "projector")
+Target.create "PushContainer_Projector" (fun _ -> push "projector")
 
 // --------------------------------------------------------------------------------
 
-Target "Build" DoNothing
-Target "Test" DoNothing
-Target "Publish" DoNothing
-Target "Pack" DoNothing
-Target "Containerize" DoNothing
-Target "Push" DoNothing
+Target.create "Build" ignore
+Target.create "Test" ignore
+Target.create "Publish" ignore
+Target.create "Pack" ignore
+Target.create "Containerize" ignore
+Target.create "Push" ignore
 
-"NpmInstall"              ==> "Build"
-"DotNetCli"               ==> "Build"
-"Clean"                   ==> "Build"
-"Restore_Solution"        ==> "Build"
-"Build_Solution"          ==> "Build"
+"NpmInstall" ==> "DotNetCli" ==> "Clean" ==> "Restore_Solution" ==> "Build_Solution" ==> "Build"
+"Build" ==> "Test_Solution" ==> "Test"
+"Test" ==> "Publish_Solution" ==> "Publish"
+"Publish" ==> "Pack_Solution" ==> "Pack"
+"Pack" ==> "Containerize_Api" ==> "Containerize_Projector" ==> "Containerize"
+"Containerize" ==> "DockerLogin" ==> "PushContainer_Api" ==> "PushContainer_Projector" ==> "Push"
 
-"Build"                   ==> "Test"
-"Test_Solution"           ==> "Test"
-
-"Test"                    ==> "Publish"
-"Publish_Solution"        ==> "Publish"
-
-"Publish"                 ==> "Pack"
-"Pack_Solution"           ==> "Pack"
-
-"Pack"                    ==> "Containerize"
-"Containerize_Api"        ==> "Containerize"
-"Containerize_Projector"  ==> "Containerize"
-// Possibly add more projects to containerize here
-
-"Containerize"            ==> "Push"
-"DockerLogin"             ==> "Push"
-"PushContainer_Api"       ==> "Push"
-"PushContainer_Projector" ==> "Push"
-// Possibly add more projects to push here
-
-// By default we build & test
-RunTargetOrDefault "Test"
+Target.runOrDefault "Test"
